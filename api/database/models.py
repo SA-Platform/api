@@ -15,6 +15,8 @@ class User(Base):
     birthday = Column(DateTime(timezone=True))
     phone_number = Column(String, nullable=True)
     email = Column(String)
+    username = Column(String)
+    password = Column(String)
     faculty = Column(String)
     university = Column(String)
     faculty_department = Column(String)
@@ -22,9 +24,7 @@ class User(Base):
     image_file = Column(String)
     bio = Column(String, nullable=True)
     confirmed = Column(Boolean, default=False)
-    username = Column(String)
     date_created = Column(DateTime(timezone=True))
-    password = Column(String)
 
     # One-to-One relationship
     user_role_division = relationship("UserRoleDivision", back_populates="user")

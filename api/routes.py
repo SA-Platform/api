@@ -1,9 +1,11 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+
+from api.validators import UserValidator
 
 app = FastAPI()
 
-@app.get("/home")
-async def home():
+@app.post("/signup", tags=["Users"], status_code= status.HTTP_201_CREATED)
+async def signup(request: UserValidator):
     return {"text": "write"}
