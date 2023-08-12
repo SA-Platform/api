@@ -1,6 +1,7 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime, BigInteger, Float
+from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime, BigInteger, Float, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+
 
 Base = declarative_base()
 
@@ -8,25 +9,25 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'user'
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    birthday = Column(DateTime(timezone=True), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    first_name = Column(String)
+    last_name = Column(String)
+    birthday = Column(DateTime(timezone=True))
     phone_number = Column(String, nullable=True)
-    email = Column(String, nullable=False)
-    faculty = Column(String, nullable=False)
-    university = Column(String, nullable=False)
-    faculty_department = Column(String, nullable=False)
-    graduation_year = Column(BigInteger, nullable=False)  # integer
-    image_file = Column(String, nullable=False)
+    email = Column(String)
+    faculty = Column(String)
+    university = Column(String)
+    faculty_department = Column(String)
+    graduation_year = Column(Integer)
+    image_file = Column(String)
     bio = Column(String, nullable=True)
-    confirmed = Column(Boolean, nullable=False, default=False)
-    username = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)  # Date Time
-    password = Column(String, nullable=False)
+    confirmed = Column(Boolean, default=False)
+    username = Column(String)
+    date_created = Column(DateTime(timezone=True))
+    password = Column(String)
 
     # One-to-One relationship
-    user_role_division = relationship("UserRoleDivision", back_populates="user", uselist=False)
+    user_role_division = relationship("UserRoleDivision", back_populates="user")
 
     # One-to-Many relationships
     announcements = relationship("Announcement", back_populates="user", lazy='dynamic')
@@ -36,7 +37,7 @@ class User(Base):
     excuses = relationship("Excuse", back_populates="user", lazy='dynamic')
     assignments = relationship("Assignment", back_populates="user", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "first_name": self.first_name,
@@ -60,19 +61,19 @@ class Announcement(Base):
     __tablename__ = "announcement"
 
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    division_id = Column(BigInteger, ForeignKey("division.id"), ondelete="CASCADE", onupdate="CASCADE")
-    date_created = Column(DateTime(timezone=True), nullable=False)
+    date_created = Column(DateTime(timezone=True))
     date = Column(DateTime(timezone=True), nullable=True)
-    category = Column(String, nullable=False)  # string
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)  # string
+    category = Column(String)
+    title = Column(String)
+    description = Column(String)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    division_id = Column(BigInteger, ForeignKey("division.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-Many relationships
     user = relationship("User", back_populates="announcements", lazy='dynamic')
     division = relationship("Division", back_populates="announcements", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -82,7 +83,6 @@ class Announcement(Base):
             "category": self.category,
             "title": self.title,
             "description": self.description,
-
         }
 
 
@@ -90,21 +90,21 @@ class Meeting(Base):
     __tablename__ = "meeting"
 
     id = Column(BigInteger, primary_key=True)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)
+    title = Column(String)
+    description = Column(String)
+    date_created = Column(DateTime(timezone=True))
     latitude = Column(Float(precision=6), nullable=True)
     longitude = Column(Float(precision=6), nullable=True)
     location_text = Column(String, nullable=True)
-    division_id = Column(BigInteger, ForeignKey("division.id"), ondelete="CASCADE", onupdate="CASCADE")
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    type = Column(String, nullable=False)
+    type = Column(String)
+    division_id = Column(BigInteger, ForeignKey("division.id", ondelete="CASCADE", onupdate="CASCADE"))
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-Many relationships
     user = relationship("User", back_populates="meeting", lazy='dynamic')
     division = relationship("Division", back_populates="meeting", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "title": self.title,
@@ -124,20 +124,18 @@ class Division(Base):
     __tablename__ = "division"
 
     id = Column(BigInteger, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String)
     parent = Column(String, nullable=True)
 
     # One-to-One relationship
-
-    userRoleDivision = relationship("UserRoleDivision", back_populates="division", uselist=False)
+    userRoleDivision = relationship("UserRoleDivision", back_populates="division")
 
     # One-to-Many relationships
-
     announcements = relationship("Announcement", back_populates="division", lazy='dynamic')
-    meeting = relationship("Meeting", back_populates="division", lazy='dynamic')
-    assignment = relationship("Assignment", back_populates="division", lazy='dynamic')  # ??????????
+    meetings = relationship("Meeting", back_populates="division", lazy='dynamic')
+    assignments = relationship("Assignment", back_populates="division", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "name": self.name,
@@ -150,12 +148,12 @@ class Role(Base):
     __tablename__ = "role"
 
     id = Column(BigInteger, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String)
 
     # One-to-One relationship
-    userRoleDivision = relationship("UserRoleDivision", back_populates="role", uselist=False)
+    userRoleDivision = relationship("UserRoleDivision", back_populates="role")
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "name": self.name,
@@ -166,16 +164,16 @@ class UserRoleDivision(Base):
     __tablename__ = "user_role_division"
 
     id = Column(BigInteger, primary_key=True)
-    role_id = Column(BigInteger, ForeignKey("role.id"), ondelete="CASCADE", onupdate="CASCADE")
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    division_id = Column(BigInteger, ForeignKey("division.id"), ondelete="CASCADE", onupdate="CASCADE")
+    role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE", onupdate="CASCADE"))
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    division_id = Column(BigInteger, ForeignKey("division.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-One relationships
-    user = relationship("User", back_populates="user_role_division", uselist=False)
-    role = relationship("Role", back_populates="user_role_division", uselist=False)
-    division = relationship("Division", back_populates="user_role_division", uselist=False)
+    user = relationship("User", back_populates="user_role_division")
+    role = relationship("Role", back_populates="user_role_division")
+    division = relationship("Division", back_populates="user_role_division")
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "role_id": self.role_id,
@@ -188,14 +186,14 @@ class Assignment(Base):
     __tablename__ = "assignment"
 
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    division_id = Column(BigInteger, ForeignKey("division.id"), ondelete="CASCADE", onupdate="CASCADE")
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)
-    deadline = Column(DateTime(timezone=True), nullable=False)
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    division_id = Column(BigInteger, ForeignKey("division.id", ondelete="CASCADE", onupdate="CASCADE"))
+    title = Column(String)
+    description = Column(String)
+    date_created = Column(DateTime(timezone=True))
+    deadline = Column(DateTime(timezone=True))
     attachment = Column(String, nullable=True)
-    weight = Column(BigInteger, nullable=False)
+    weight = Column(Integer)
 
     # One-to-Many relationships
     user = relationship("User", back_populates="assignment", lazy='dynamic')
@@ -203,7 +201,7 @@ class Assignment(Base):
     submission = relationship("Submission", back_populates="assignment", lazy='dynamic')
     excuse = relationship("Excuse", back_populates="assignment", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -220,20 +218,19 @@ class Assignment(Base):
 
 class Excuse(Base):
     __tablename__ = "excuse"
-
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    assignment_id = Column(BigInteger, ForeignKey("assignment.id"), ondelete="CASCADE", onupdate="CASCADE")
-    description = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)
-    validity = Column(DateTime(timezone=True), nullable=False)
+    description = Column(String)
+    date_created = Column(DateTime(timezone=True))
+    validity = Column(DateTime(timezone=True))
     accepted = Column(Boolean, nullable=True, default=False)
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    assignment_id = Column(BigInteger, ForeignKey("assignment.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-Many relationships
     user = relationship("User", back_populates="excuse", lazy='dynamic')
     assignment = relationship("Assignment", back_populates="excuse", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -250,18 +247,18 @@ class Submission(Base):
     __tablename__ = "submission"
 
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    assignment_id = Column(BigInteger, ForeignKey("assignment.id"), ondelete="CASCADE", onupdate="CASCADE")
-    attachment = Column(String, nullable=False)
-    note = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)
+    attachment = Column(String)
+    note = Column(String)
+    date_created = Column(DateTime(timezone=True))
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    assignment_id = Column(BigInteger, ForeignKey("assignment.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-Many relationships
     user = relationship("User", back_populates="submission", lazy='dynamic')
     assignment = relationship("Assignment", back_populates="submission", lazy='dynamic')
     feedback = relationship("Feedback", back_populates="submission", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -277,18 +274,18 @@ class Feedback(Base):
     __tablename__ = "feedback"
 
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("user.id"), ondelete="CASCADE", onupdate="CASCADE")
-    submission_id = Column(BigInteger, ForeignKey("submission.id"), ondelete="CASCADE", onupdate="CASCADE")
-    attachment = Column(String, nullable=False)
-    score = Column(BigInteger, nullable=False)
-    note = Column(String, nullable=False)
-    date_created = Column(DateTime(timezone=True), nullable=False)
+    attachment = Column(String)
+    score = Column(BigInteger)
+    note = Column(String)
+    date_created = Column(DateTime(timezone=True))
+    user_id = Column(BigInteger, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
+    submission_id = Column(BigInteger, ForeignKey("submission.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     # One-to-Many relationships
     user = relationship("User", back_populates="feedback", lazy='dynamic')
     submission = relationship("Submission", back_populates="feedback", lazy='dynamic')
 
-    def print(self):
+    def __str__(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
