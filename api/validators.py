@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, DirectoryPath
 from datetime import datetime
 
 
-class UserValidator(BaseModel):
+class UserSignup(BaseModel):
     first_name: str = Field(min_length=2)
     last_name: str = Field(min_length=2)
     birthdate: datetime
