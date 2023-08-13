@@ -1,0 +1,16 @@
+# Ignore the virtual environment directory
+.venv/
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore IDE & VSCODE directory
+.vscode/
+.idea/
+# Ignore databases
+*.db
+
+# Ignore space (deployment)
+.space
+Spacefile
+.spaceignore
