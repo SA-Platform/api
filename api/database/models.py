@@ -1,5 +1,5 @@
 import datetime
-
+import bcrypt
 from sqlalchemy import String, Boolean, DateTime, Integer
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
@@ -28,10 +28,33 @@ class User(Base):
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
+    def set_password(self, password) -> str:
+        self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        return self.password
+
+    def __init__(self, first_name: str, last_name: str, birthdate: datetime.datetime,
+                 phone_number: str, email: str, username: str, password: str,
+                 faculty: str, university: str, faculty_department: str,
+                 graduation_year: int, image_file: str, bio: str = None) -> None:
+        self.first_name = first_name
+        self.last_name = last_name
+        self.birthdate = birthdate
+        self.phone_number = phone_number
+        self.email = email
+        self.username = username
+        self.set_password(password)
+        self.faculty = faculty
+        self.university = university
+        self.faculty_department = faculty_department
+        self.graduation_year = graduation_year
+        self.image_file = image_file
+        self.bio = bio
+
     def __repr__(self):
         return f"""User(
             "id": {self.id}
             "first_name": {self.first_name}
+            "last_name": {self.last_name}
             "birthday": {self.birthdate}
             "phone_number": {self.phone_number}
             "email": {self.email}
@@ -46,3 +69,6 @@ class User(Base):
             "date_created": {self.date_created}
             "password": {self.password}
         )"""
+
+
+
