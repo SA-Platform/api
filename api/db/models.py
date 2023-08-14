@@ -34,13 +34,13 @@ class User(Base):
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         return self.password
 
-    def check_password(self, password) ->bool:
+    def check_password(self, password) -> bool:
         return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
 
     def __init__(self, first_name: str, last_name: str, birthdate: datetime.datetime,
-                 phone_number: str, email: str, username: str, password: str,
-                 faculty: str, university: str, faculty_department: str,
-                 graduation_year: int, image_file: str, bio: str = None) -> None:
+                    phone_number: str, email: str, username: str, password: str,
+                    faculty: str, university: str, faculty_department: str,
+                    graduation_year: int, image_file: str, bio: str = None) -> None:
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
@@ -103,7 +103,7 @@ class Permission(Base):
     set_role: Mapped[bool]
     edit_role: Mapped[bool]
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
-    role: Mapped[User] = Relationship("Role", backref="permissions")
+    role: Mapped[Role] = Relationship("Role", backref="permissions")
 
     def __repr__(self):
         return f"""Permission(
