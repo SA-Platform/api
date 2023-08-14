@@ -1,8 +1,8 @@
 from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from api.validators import UserSignup
-from api.db.models import User
+from api.validators import UserSignup, AnnouncementValidator
+from api.db.models import User, Announcement
 from api.utils import get_db, create_token, get_current_user
 
 app: FastAPI = FastAPI()
@@ -18,7 +18,8 @@ async def signup(request: UserSignup, db: Session = Depends(get_db)):
 
 @app.post("/signin", tags=["Users"], status_code=status.HTTP_200_OK)
 async def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user: User | None = db.query(User).filter((User.email == form_data.username) | (User.username == form_data.username)).first()
+    user: User | None = db.query(User).filter(
+        (User.email == form_data.username) | (User.username == form_data.username)).first()
     if user:
         if user.check_password(form_data.password):
             return {"access_token": create_token({"username": user.username}), "token_type": "bearer"}
@@ -29,5 +30,44 @@ async def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
 
 
 @app.get("/getusers", tags=["Users"], status_code=status.HTTP_200_OK)
-async def get_users(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
     return db.query(User).all()
+
+
+####################### Annauncement endpoints###############################
+
+@app.get("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
+async def get_announcements(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    return db.query(Announcement).all()
+
+
+@app.post("/announcements", tags=["Announcements"], status_code=status.HTTP_201_CREATED)
+async def post_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
+                            _: User = Depends(get_current_user)):
+    new_Announcement: Announcement = Announcement(**request.model_dump())
+    db.add(new_Announcement)
+    db.commit()
+    return new_Announcement
+
+
+@app.put("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
+async def update_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
+                              _: User = Depends(get_current_user)):
+    announcement = db.query(Announcement).filter(Announcement.id == request.announcement_id).first()
+    if not announcement:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    announcement.content = request.new_content
+    db.commit()
+    db.refresh(announcement)
+    return announcement
+
+
+@app.delete("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
+async def delete_announcement(announcement_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    if not announcement:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    db.delete(announcement)
+    db.commit()
+
+########################################################################
