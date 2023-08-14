@@ -2,7 +2,7 @@ import datetime
 from typing import List
 
 import bcrypt
-from sqlalchemy import String, Boolean, DateTime, Integer, ForeignKey
+from sqlalchemy import String, Boolean, DateTime, Integer, ForeignKey, Float
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, Relationship
 
 
@@ -30,6 +30,10 @@ class User(Base):
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
+    # One-to-Many relationships
+    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="users")
+    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", backref="users")
+
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         return self.password
@@ -38,9 +42,9 @@ class User(Base):
         return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
 
     def __init__(self, first_name: str, last_name: str, birthdate: datetime.datetime,
-                    phone_number: str, email: str, username: str, password: str,
-                    faculty: str, university: str, faculty_department: str,
-                    graduation_year: int, image_file: str, bio: str = None) -> None:
+                 phone_number: str, email: str, username: str, password: str,
+                 faculty: str, university: str, faculty_department: str,
+                 graduation_year: int, image_file: str, bio: str = None) -> None:
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
@@ -76,19 +80,6 @@ class User(Base):
         )"""
 
 
-class Role(Base):
-    __tablename__ = 'roles'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30), unique=True)
-    permissions: Mapped[List["Permission"]] = Relationship("Permission", backref="role")
-
-    def __repr__(self):
-        return f"""Role(
-            "id": {self.id}
-            "name": {self.name}
-        )"""
-
 class Permission(Base):
     __tablename__ = 'permissions'
 
@@ -103,7 +94,9 @@ class Permission(Base):
     set_role: Mapped[bool]
     edit_role: Mapped[bool]
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
-    role: Mapped[Role] = Relationship("Role", backref="permissions")
+
+    # One-to-One relationships
+    role: Mapped["Role"] = Relationship("Role", backref="permissions")
 
     def __repr__(self):
         return f"""Permission(
@@ -119,3 +112,100 @@ class Permission(Base):
             "edit_role": {self.edit_role}
             "role_id": {self.role_id}
         )"""
+
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(30), unique=True)
+
+    # One-to-One relationships
+    permissions: Mapped["Permission"] = Relationship("Permission", backref="role")
+
+    def __repr__(self):
+        return f"""Role(
+            "id": {self.id}
+            "name": {self.name}
+        )"""
+
+
+
+class Division(Base):
+    __tablename__ = "division"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(30))
+    parent: Mapped[str] = mapped_column(String(30))
+
+    # One-to-Many relationships
+    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="division")
+    meeting: Mapped[List["Meeting"]] = Relationship("Meeting", backref="division")
+
+    # assignment: Mapped[List[Assignment]] = Relationship("Assignment", backref="division")
+
+    def __repr__(self):
+        return f"""{
+        "id": {self.id},
+            "name": {self.name},
+            "parent": {self.parent},
+        }"""
+
+class Meeting(Base):
+    tablename = 'meetings'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(30))
+    description: Mapped[str] = mapped_column(String(100))
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    location_text: Mapped[str] = mapped_column(String(100))
+    location_lat: Mapped[float] = mapped_column(Float)
+    location_long: Mapped[float] = mapped_column()
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+
+    # Many-to-One relationships
+    division: Mapped["Division"] = Relationship("Division", backref="meetings")
+    creator: Mapped["User"] = Relationship("User", backref="meetings")
+
+    def repr(self):
+        return f"""Meeting(
+            "id": {self.id}
+            "title": {self.title}
+            "description": {self.description}
+            "date_created": {self.date_created}
+            "location_text": {self.location_text}
+            "location_lat": {self.location_lat}
+            "location_long": {self.location_long}
+            "user_id": {self.user_id}
+            "division_id": {self.division_id}
+        )"""
+
+class Announcement(Base):
+    __tablename__ = "announcement"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    division_id: Mapped[int] = mapped_column(ForeignKey("division.id"))
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    category: Mapped[str] = mapped_column(String)
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+
+    # One-to-Many relationships
+    user: Mapped["User"] = Relationship("User", backref="announcements")
+    division: Mapped["Division"] = Relationship("Division", backref="announcements")
+
+    def __repr__(self):
+        return f"""Permission(
+                "id": {self.id},
+                "user_id": {self.user_id},
+                "division_id": {self.division_id},
+                "date_created": {self.date_created},
+                "date": {self.date},
+                "category": {self.category},
+                "title": {self.title},
+                "description": {self.description},
+            )"""
