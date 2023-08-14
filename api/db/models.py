@@ -31,8 +31,8 @@ class User(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # One-to-Many relationships
-    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="users")
-    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", backref="users")
+    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="creator")
+    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", backref="creator")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -114,7 +114,6 @@ class Permission(Base):
         )"""
 
 
-
 class Role(Base):
     __tablename__ = 'roles'
 
@@ -131,15 +130,16 @@ class Role(Base):
         )"""
 
 
-
 class Division(Base):
-    __tablename__ = "division"
+    __tablename__ = "divisions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
-    parent: Mapped[str] = mapped_column(String(30))
+    parent_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # One-to-Many relationships
+    subdivision: Mapped["Division"] = Relationship("Division", backref="subdivisions")
+    parent: Mapped["Division"] = Relationship("Division", backref="parent", remote_side=[id])
     announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="division")
     meeting: Mapped[List["Meeting"]] = Relationship("Meeting", backref="division")
 
@@ -152,8 +152,9 @@ class Division(Base):
             "parent": {self.parent},
         }"""
 
+
 class Meeting(Base):
-    tablename = 'meetings'
+    __tablename__ = 'meetings'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(30))
@@ -162,7 +163,7 @@ class Meeting(Base):
     location_text: Mapped[str] = mapped_column(String(100))
     location_lat: Mapped[float] = mapped_column(Float)
     location_long: Mapped[float] = mapped_column()
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
@@ -178,30 +179,32 @@ class Meeting(Base):
             "location_text": {self.location_text}
             "location_lat": {self.location_lat}
             "location_long": {self.location_long}
-            "user_id": {self.user_id}
+            "creator_id": {self.creator_id}
             "division_id": {self.division_id}
         )"""
 
+
 class Announcement(Base):
-    __tablename__ = "announcement"
+    __tablename__ = "announcements"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    division_id: Mapped[int] = mapped_column(ForeignKey("division.id"))
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     category: Mapped[str] = mapped_column(String)
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # One-to-Many relationships
-    user: Mapped["User"] = Relationship("User", backref="announcements")
     division: Mapped["Division"] = Relationship("Division", backref="announcements")
+    creator: Mapped["User"] = Relationship("User", backref="announcements")
+
 
     def __repr__(self):
         return f"""Permission(
                 "id": {self.id},
-                "user_id": {self.user_id},
+                "creator_id": {self.creator_id},
                 "division_id": {self.division_id},
                 "date_created": {self.date_created},
                 "date": {self.date},
