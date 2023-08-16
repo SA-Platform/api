@@ -160,6 +160,7 @@ class Meeting(Base):
     title: Mapped[str] = mapped_column(String(30))
     description: Mapped[str] = mapped_column(String(100))
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     location_text: Mapped[str] = mapped_column(String(100))
     location_lat: Mapped[float] = mapped_column(Float)
     location_long: Mapped[float] = mapped_column()
