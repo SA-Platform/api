@@ -11,7 +11,7 @@ class AnnouncementsCategory(str, Enum):
     OTHER = "other"
 
 
-class UserSignup(BaseModel):
+class UserValidator(BaseModel):
     first_name: str = Field(min_length=2)
     last_name: str = Field(min_length=2)
     birthdate: datetime
@@ -70,3 +70,27 @@ class AnnouncementValidator(BaseModel):
                 "division": "ras",
             }
         }
+
+
+class MeetingValidator(BaseModel):
+    title: str = Field(min_length=2)
+    description: str = Field(min_length=2)
+    location_text: str | None = Field(min_length=2)
+    location_lat: float = Field(decimal_places=6)
+    location_long: float = Field(decimal_places=6)
+    creator: str = Field(min_length=2)
+    division: str = Field(min_length=2)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "this is an meeting",
+                "description": "this is really an meeting",
+                "location_text": "our lovely college",
+                "location_long": "30.586388",
+                "location_lat": "31.482434",
+                "creator": "J3uvaobz",
+                "division": "CS",
+            }
+        }
+

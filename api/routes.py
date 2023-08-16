@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from api.validators import UserSignup, AnnouncementValidator
+from api.validators import UserValidator, AnnouncementValidator
 from api.db.models import User, Announcement
 from api.utils import get_db, create_token, get_current_user
 
@@ -9,7 +9,7 @@ app: FastAPI = FastAPI()
 
 
 @app.post("/signup", tags=["Users"], status_code=status.HTTP_201_CREATED)
-async def signup(request: UserSignup, db: Session = Depends(get_db)):
+async def signup(request: UserValidator, db: Session = Depends(get_db)):
     new_user: User = User(**request.model_dump())
     db.add(new_user)
     db.commit()
