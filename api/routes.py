@@ -29,5 +29,6 @@ async def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
 
 
 @app.get("/getusers", tags=["Users"], status_code=status.HTTP_200_OK)
-async def get_users(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
     return db.query(User).all()
+
