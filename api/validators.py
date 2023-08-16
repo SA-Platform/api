@@ -49,7 +49,7 @@ class UserSignup(BaseModel):
 class AnnouncementValidator(BaseModel):
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
-    date: datetime
+    date: datetime | None
     category: AnnouncementsCategory
     division: str | None = Field(min_length=2)
 
@@ -65,7 +65,7 @@ class AnnouncementValidator(BaseModel):
             "example": {
                 "title": "this is an announcement",
                 "description": "this is really an announcement",
-                "date": "2023-04-24T22:01:32.904Z",
+                "date": "2025-04-24T22:01:32.904Z",
                 "category": "internship",
                 "division": "ras",
             }
