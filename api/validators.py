@@ -1,6 +1,10 @@
+from _pydecimal import Decimal
+
 from pydantic import BaseModel, Field, EmailStr, field_validator
 from datetime import datetime
 from enum import Enum
+
+from pydantic.v1 import confloat, validator
 
 
 class AnnouncementsCategory(str, Enum):
@@ -76,10 +80,18 @@ class MeetingValidator(BaseModel):
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
     location_text: str | None = Field(min_length=2)
-    location_lat: float = Field(decimal_places=6)
-    location_long: float = Field(decimal_places=6)
+    location_lat: float = Field(ge=-90.0, le=90.0)
+    location_long: float = Field(ge=-180.0, le=180.0)
     creator: str = Field(min_length=2)
     division: str = Field(min_length=2)
+
+    @validator("location_lat", "location_long", pre=True, always=True)
+    def check_precision(self, value: float) -> float:
+        if isinstance(value, float):
+            precision = len(str(value).split('.')[-1])
+            if precision < 6:
+                raise ValueError("Float value must have at least 6 decimal places.")
+        return value
 
     class Config:
         json_schema_extra = {
@@ -93,4 +105,3 @@ class MeetingValidator(BaseModel):
                 "division": "CS",
             }
         }
-
