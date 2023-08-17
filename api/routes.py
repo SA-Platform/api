@@ -1,5 +1,6 @@
 from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from api.validators import UserValidator, AnnouncementValidator, DivisionValidator
 from api.db.models import User, Announcement, Division
@@ -32,6 +33,24 @@ async def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
 @app.get("/getusers", tags=["Users"], status_code=status.HTTP_200_OK)
 async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
     return db.query(User).all()
+
+
+@app.post("/validate_username", tags=["Users"], status_code=status.HTTP_202_ACCEPTED)
+async def validate_username(username: str, db: Session = Depends(get_db),
+                            current_user: User = Depends(get_current_user)):
+    existing_user = db.query(User).filter_by(username=username).first()
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
+    return {"message": "Username is available"}
+
+
+@app.post("/validate_email", tags=["Users"], status_code=status.HTTP_202_ACCEPTED)
+async def validate_username(email: EmailStr, db: Session = Depends(get_db),
+                            current_user: User = Depends(get_current_user)):
+    existing_user = db.query(User).filter_by(email=email).first()
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
+    return {"message": "Email is available"}
 
 
 @app.get("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
