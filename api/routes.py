@@ -69,10 +69,41 @@ async def delete_announcement(announcement_id: int, db: Session = Depends(get_db
     db.commit()
 
 
+@app.get("/divisions", tags=["Divisions"], status_code=status.HTTP_200_OK)
+async def get_divisions(db: Session = Depends(get_db),
+                        _: User = Depends(get_current_user)):
+    return db.query(Division).all()
+
+
 @app.post("/divisions", tags=["Divisions"], status_code=status.HTTP_201_CREATED)
 async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: User = Depends(get_current_user)):
-    new_division: Division = Division(name=request.name, parent=db.query(Division).filter_by(name=request.parent).first())
+    new_division: Division = Division(name=request.name,
+                                      parent=db.query(Division).filter_by(name=request.parent).first())
     db.add(new_division)
     db.commit()
     return new_division
+
+
+@app.put("/divisions", tags=["Divisions"], status_code=status.HTTP_200_OK)
+async def update_division(request: DivisionValidator, db: Session = Depends(get_db),
+                          _: User = Depends(get_current_user)):
+    division = db.query(Division).filter_by(name=request.name).first()
+    if not Division:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Division not found")
+    if not Division.parent:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent not found")
+    division.parent = db.query(Division).filter_by(name=request.parent).first()
+    db.commit()
+    db.refresh(division)
+    return division
+
+
+@app.delete("/divisions", tags=["Divisions"], status_code=status.HTTP_200_OK)
+async def delete_division(division_name: str, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+    division = db.query(Division).filter_by(name=division_name).first()
+    if not division:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Division not found")
+    db.delete(division)
+    db.commit()
+    return {"message": f"Division '{division_name}' deleted successfully"}
