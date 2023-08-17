@@ -27,9 +27,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user:
         return user
     raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User in token is not found", # debugging only
-            headers={"WWW-Authenticate": "Bearer"},
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="User in token is not found",  # debugging only
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
 
@@ -47,4 +47,3 @@ def decode_token(token):
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-

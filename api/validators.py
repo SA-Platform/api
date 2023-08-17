@@ -1,18 +1,16 @@
 from _pydecimal import Decimal
 
-from pydantic import BaseModel, Field, EmailStr, field_validator
+from pydantic import (BaseModel,
+                      Field,
+                      EmailStr,
+                      field_validator,
+                      confloat,
+                      model_validator)
 from datetime import datetime
-from enum import Enum
+from api.const import AnnouncementsCategory
 
-from pydantic.v1 import confloat, validator
-
-
-class AnnouncementsCategory(str, Enum):
-    INTERNSHIP = "internship"
-    EVENT = "event"
-    WORKSHOP = "workshop"
-    COMPETITION = "competition"
-    OTHER = "other"
+from api.utils import get_db
+from api.db.models import Division
 
 
 class UserValidator(BaseModel):
@@ -51,6 +49,7 @@ class UserValidator(BaseModel):
 
 
 class AnnouncementValidator(BaseModel):
+    id: int | None = None
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
     date: datetime | None
@@ -58,7 +57,6 @@ class AnnouncementValidator(BaseModel):
     division: str | None = Field(min_length=2)
 
     @field_validator("date")
-    @classmethod
     def validate_date_future(cls, v: datetime) -> datetime:
         if v < datetime.now():
             raise ValueError("date must be in the future")
@@ -79,14 +77,20 @@ class AnnouncementValidator(BaseModel):
 class MeetingValidator(BaseModel):
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
+    date: datetime
     location_text: str | None = Field(min_length=2)
     location_lat: float = Field(ge=-90.0, le=90.0)
     location_long: float = Field(ge=-180.0, le=180.0)
-    creator: str = Field(min_length=2)
     division: str = Field(min_length=2)
 
-    @validator("location_lat", "location_long", pre=True, always=True)
-    def check_precision(self, value: float) -> float:
+    @field_validator("date")
+    def validate_date_future(cls, v: datetime) -> datetime:
+        if v < datetime.now():
+            raise ValueError("date must be in the future")
+        return v
+
+    @field_validator("location_lat", "location_long")
+    def check_precision(cls, value: float) -> float:
         if isinstance(value, float):
             precision = len(str(value).split('.')[-1])
             if precision < 6:
@@ -98,10 +102,44 @@ class MeetingValidator(BaseModel):
             "example": {
                 "title": "this is an meeting",
                 "description": "this is really an meeting",
+                "date": "2025-04-24T22:01:32.904Z",
                 "location_text": "our lovely college",
                 "location_long": "30.586388",
                 "location_lat": "31.482434",
-                "creator": "J3uvaobz",
                 "division": "CS",
+            }
+        }
+
+
+class DivisionValidator(BaseModel):
+    name: str = Field(min_length=2)
+    parent: str | None = None
+
+    @model_validator(mode="after")
+    def division_exists(self) -> "DivisionValidator":
+        db: Session = next(get_db())
+        division = db.query(Division).filter_by(name=self.name).first()
+        parent = db.query(Division).filter_by(name=self.parent).first()
+        if self.parent:
+            if not parent:
+                raise ValueError("parent division doesn't exist")
+
+            if division:
+                if division.parent == parent:
+                    raise ValueError(f"division {division.name} with the same parent ({parent.name}) already exists")
+                elif not division.parent:
+                    raise ValueError(f"division {division.name} is a root division and can't have a parent")
+            return self
+        else:
+            root = db.query(Division).filter_by(parent=None).first()
+            if root:
+                raise ValueError(f"only one root division is allowed, which is {root.name}")
+            return self
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "CS",
+                "parent": "IEEE",
             }
         }

@@ -1,8 +1,8 @@
 from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from api.validators import UserValidator, AnnouncementValidator
-from api.db.models import User, Announcement
+from api.validators import UserValidator, AnnouncementValidator, DivisionValidator
+from api.db.models import User, Announcement, Division
 from api.utils import get_db, create_token, get_current_user
 
 app: FastAPI = FastAPI()
@@ -34,29 +34,27 @@ async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current
     return db.query(User).all()
 
 
-####################### Annauncement endpoints###############################
-
 @app.get("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
-async def get_announcements(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def get_announcements(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
     return db.query(Announcement).all()
 
 
 @app.post("/announcements", tags=["Announcements"], status_code=status.HTTP_201_CREATED)
 async def post_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                             _: User = Depends(get_current_user)):
-    new_Announcement: Announcement = Announcement(**request.model_dump())
-    db.add(new_Announcement)
+    new_announcement: Announcement = Announcement(**request.model_dump())
+    db.add(new_announcement)
     db.commit()
-    return new_Announcement
+    return new_announcement
 
 
 @app.put("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
 async def update_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                               _: User = Depends(get_current_user)):
-    announcement = db.query(Announcement).filter(Announcement.id == request.announcement_id).first()
+    announcement = db.query(Announcement).filter_by(id=request.id).first()
     if not announcement:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
-    announcement.content = request.new_content
+    announcement = Announcement(**request.model_dump())
     db.commit()
     db.refresh(announcement)
     return announcement
@@ -64,10 +62,17 @@ async def update_announcement(request: AnnouncementValidator, db: Session = Depe
 
 @app.delete("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
 async def delete_announcement(announcement_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
-    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
-    if not announcement:
+    announcement = db.query(Announcement).filter_by(id=announcement_id).first()
+    if announcement:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
     db.delete(announcement)
     db.commit()
 
-########################################################################
+
+@app.post("/divisions", tags=["Divisions"], status_code=status.HTTP_201_CREATED)
+async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
+                          _: User = Depends(get_current_user)):
+    new_division: Division = Division(name=request.name, parent=db.query(Division).filter_by(name=request.parent).first())
+    db.add(new_division)
+    db.commit()
+    return new_division
