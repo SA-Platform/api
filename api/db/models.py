@@ -4,6 +4,7 @@ from typing import List
 import bcrypt
 from sqlalchemy import String, Boolean, DateTime, Integer, ForeignKey, Float
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, Relationship
+from api.const import AnnouncementsCategory
 
 
 class Base(DeclarativeBase):
@@ -31,8 +32,8 @@ class User(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # One-to-Many relationships
-    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="creator")
-    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", backref="creator")
+    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="creator")
+    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="creator")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -96,7 +97,7 @@ class Permission(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
 
     # One-to-One relationships
-    role: Mapped["Role"] = Relationship("Role", backref="permissions")
+    role: Mapped["Role"] = Relationship("Role", back_populates="permissions")
 
     def __repr__(self):
         return f"""Permission(
@@ -121,7 +122,7 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(30), unique=True)
 
     # One-to-One relationships
-    permissions: Mapped["Permission"] = Relationship("Permission", backref="role")
+    permissions: Mapped["Permission"] = Relationship("Permission", back_populates="role")
 
     def __repr__(self):
         return f"""Role(
@@ -135,22 +136,18 @@ class Division(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
-    parent_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+    parent_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"), nullable=True)
 
     # One-to-Many relationships
-    subdivision: Mapped["Division"] = Relationship("Division", backref="subdivisions")
-    parent: Mapped["Division"] = Relationship("Division", backref="parent", remote_side=[id])
-    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", backref="division")
-    meeting: Mapped[List["Meeting"]] = Relationship("Meeting", backref="division")
+    subdivisions: Mapped[List["Division"]] = Relationship("Division", back_populates="parent")
+    parent: Mapped["Division"] = Relationship("Division", back_populates="subdivisions", remote_side=[id])
+    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="division")
+    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="division")
 
-    # assignment: Mapped[List[Assignment]] = Relationship("Assignment", backref="division")
+    # assignment: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="division")
 
     def __repr__(self):
-        return f"""{
-        "id": {self.id},
-            "name": {self.name},
-            "parent": {self.parent},
-        }"""
+        return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""
 
 
 class Meeting(Base):
@@ -168,8 +165,8 @@ class Meeting(Base):
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
-    division: Mapped["Division"] = Relationship("Division", backref="meetings")
-    creator: Mapped["User"] = Relationship("User", backref="meetings")
+    division: Mapped["Division"] = Relationship("Division", back_populates="meetings")
+    creator: Mapped["User"] = Relationship("User", back_populates="meetings")
 
     def repr(self):
         return f"""Meeting(
@@ -191,16 +188,15 @@ class Announcement(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    category: Mapped[str] = mapped_column(String)
+    category: Mapped[AnnouncementsCategory] = mapped_column(String)
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # One-to-Many relationships
-    division: Mapped["Division"] = Relationship("Division", backref="announcements")
-    creator: Mapped["User"] = Relationship("User", backref="announcements")
-
+    division: Mapped["Division"] = Relationship("Division", back_populates="announcements")
+    creator: Mapped["User"] = Relationship("User", back_populates="announcements")
 
     def __repr__(self):
         return f"""Permission(
