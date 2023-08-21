@@ -2,7 +2,7 @@ from fastapi import FastAPI, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
-from api.validators import UserValidator, AnnouncementValidator, DivisionValidator
+from api.validators import UserValidator, AnnouncementValidator, DivisionValidator, UsernameValidator
 from api.db.models import User, Announcement, Division
 from api.utils import get_db, create_token, get_current_user
 
@@ -11,6 +11,9 @@ app: FastAPI = FastAPI()
 
 @app.post("/signup", tags=["Users"], status_code=status.HTTP_201_CREATED)
 async def signup(request: UserValidator, db: Session = Depends(get_db)):
+    if db.query(User).filter_by(email=request.email).first():
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
+
     new_user: User = User(**request.model_dump())
     db.add(new_user)
     db.commit()
@@ -36,21 +39,20 @@ async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current
 
 
 @app.post("/validate_username", tags=["Users"], status_code=status.HTTP_202_ACCEPTED)
-async def validate_username(username: str, db: Session = Depends(get_db),
-                            current_user: User = Depends(get_current_user)):
-    existing_user = db.query(User).filter_by(username=username).first()
+async def validate_username(request: UsernameValidator,
+                            db: Session = Depends(get_db)):  ##### need to change the validation error msg
+    existing_user = db.query(User).filter_by(username=request.username).first()
     if existing_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-    return {"message": "Username is available"}
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="username is taken")
+    return {"message": "username is available"}
 
 
-@app.post("/validate_email", tags=["Users"], status_code=status.HTTP_202_ACCEPTED)
-async def validate_username(email: EmailStr, db: Session = Depends(get_db),
-                            current_user: User = Depends(get_current_user)):
-    existing_user = db.query(User).filter_by(email=email).first()
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
-    return {"message": "Email is available"}
+# @app.post("/validate_email", tags=["Users"], status_code=status.HTTP_202_ACCEPTED)
+# async def validate_email(email: EmailStr, db: Session = Depends(get_db)):
+#     existing_user = db.query(User).filter_by(email=email).first()
+#     if existing_user:
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
+#     return {"message": "Email is available"}
 
 
 @app.get("/announcements", tags=["Announcements"], status_code=status.HTTP_200_OK)
@@ -107,22 +109,19 @@ async def create_division(request: DivisionValidator, db: Session = Depends(get_
 @app.put("/divisions", tags=["Divisions"], status_code=status.HTTP_200_OK)
 async def update_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: User = Depends(get_current_user)):
-    division = db.query(Division).filter_by(name=request.name).first()
-    if not Division:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Division not found")
-    if not Division.parent:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent not found")
-    division.parent = db.query(Division).filter_by(name=request.parent).first()
+    division = db.query(Division).filter_by(id=request.id).first()  # fetch division to be edited
+    division.name = request.name  # set its name
+    division.parent = db.query(Division).filter_by(name=request.parent).first()  # set its parent
     db.commit()
     db.refresh(division)
     return division
 
 
 @app.delete("/divisions", tags=["Divisions"], status_code=status.HTTP_200_OK)
-async def delete_division(division_name: str, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
-    division = db.query(Division).filter_by(name=division_name).first()
-    if not division:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Division not found")
-    db.delete(division)
-    db.commit()
-    return {"message": f"Division '{division_name}' deleted successfully"}
+async def delete_division(division_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+    division = db.query(Division).filter_by(id=division_id).first()
+    if division:
+        db.delete(division)
+        db.commit()
+        return {"message": "division deleted successfully"}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")
