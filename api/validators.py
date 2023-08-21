@@ -1,16 +1,29 @@
-from _pydecimal import Decimal
-
 from pydantic import (BaseModel,
                       Field,
                       EmailStr,
                       field_validator,
-                      confloat,
                       model_validator)
 from datetime import datetime
+
+from sqlalchemy.orm import Session
+
 from api.const import AnnouncementsCategory
 
-from api.utils import get_db
 from api.db.models import Division
+from api.dependencies import get_db
+
+
+class Message(BaseModel):
+    message: str
+
+
+class HTTPError(BaseModel):
+    detail: str
+
+    class Config:
+        schema_extra = {
+            "example": {"detail": "HTTPException raised."},
+        }
 
 
 class UserValidator(BaseModel):
