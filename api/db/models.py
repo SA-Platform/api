@@ -173,6 +173,7 @@ class Meeting(Base):
             "id": {self.id}
             "title": {self.title}
             "description": {self.description}
+            "date": {self.date}
             "date_created": {self.date_created}
             "location_text": {self.location_text}
             "location_lat": {self.location_lat}
