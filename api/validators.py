@@ -3,7 +3,7 @@ from pydantic import (BaseModel,
                       EmailStr,
                       field_validator,
                       model_validator)
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
@@ -67,11 +67,11 @@ class AnnouncementValidator(BaseModel):
     description: str = Field(min_length=2)
     date: datetime | None
     category: AnnouncementsCategory
-    division: str | None = Field(min_length=2)
+    division: str = Field(min_length=2)
 
     @field_validator("date")
     def validate_date_future(cls, v: datetime) -> datetime:
-        if v < datetime.now():
+        if v < datetime.now(timezone.utc):
             raise ValueError("date must be in the future")
         return v
 
@@ -88,6 +88,7 @@ class AnnouncementValidator(BaseModel):
 
 
 class MeetingValidator(BaseModel):
+    id: int | None = None
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
     date: datetime
@@ -98,7 +99,7 @@ class MeetingValidator(BaseModel):
 
     @field_validator("date")
     def validate_date_future(cls, v: datetime) -> datetime:
-        if v < datetime.now():
+        if v < datetime.now(timezone.utc):
             raise ValueError("date must be in the future")
         return v
 
