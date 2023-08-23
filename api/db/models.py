@@ -34,6 +34,10 @@ class User(Base):
     # One-to-Many relationships
     announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="creator")
     meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="creator")
+    assignments: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="creator")
+    excuse: Mapped[List["Excuse"]] = Relationship("Excuse", back_populates="creator")
+    submission: Mapped[List["Submission"]] = Relationship("Submission", back_populates="creator")
+    feedback: Mapped[List["Feedback"]] = Relationship("Feedback", back_populates="creator")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -143,8 +147,7 @@ class Division(Base):
     parent: Mapped["Division"] = Relationship("Division", back_populates="subdivisions", remote_side=[id])
     announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="division")
     meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="division")
-
-    # assignment: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="division")
+    assignments: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="division")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""
@@ -209,7 +212,8 @@ class Announcement(Base):
     division: Mapped["Division"] = Relationship("Division", back_populates="announcements")
     creator: Mapped["User"] = Relationship("User", back_populates="announcements")
 
-    def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime, division: Division) -> None:
+    def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime,
+               division: Division) -> None:
         self.title = title
         self.description = description
         self.category = category
@@ -226,4 +230,125 @@ class Announcement(Base):
                 "category": {self.category},
                 "title": {self.title},
                 "description": {self.description},
+            )"""
+
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attachment: Mapped[str] = mapped_column(String, nullable=True)
+    weight: Mapped[int] = mapped_column(Integer)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+
+    # Many-to-One relationships
+    creator: Mapped["User"] = Relationship("User", back_populates="assignments")
+    division: Mapped["Division"] = Relationship("Division", back_populates="assignments")
+
+    # One-to-Many relationships
+    submission: Mapped["Submission"] = Relationship("Submission", back_populates="assignments")
+    excuse: Mapped["Excuse"] = Relationship("Excuse", back_populates="assignments")
+
+    def update(self, title: str, description: str, deadline: datetime, attachment: str,
+               weight: int, division: Division) -> None:
+        self.title = title
+        self.description = description
+        self.deadline = deadline
+        self.attachment = attachment
+        self.weight = weight
+        self.division = division
+
+    def __repr__(self):
+        return f"""Permission(
+                "id": {self.id},
+                "creator_id": {self.creator_id},
+                "division_id": {self.division_id},
+                "date_created": {self.date_created},
+                "title": {self.title},
+                "description": {self.description},
+                "deadline": {self.deadline},
+                "attachment": {self.attachment},
+                "weight": {self.weight},
+            )"""
+
+
+class Excuse(Base):
+    __tablename__ = "excuse"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    assignment_id: Mapped[int] = mapped_column(ForeignKey("assignments.id"))
+    description: Mapped[str] = mapped_column(String)
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    validity: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted: Mapped[bool] = mapped_column(Boolean)
+
+    # Many-to-one relationships
+    creator: Mapped["User"] = Relationship("User", back_populates="excuse")
+    assignments: Mapped["Assignment"] = Relationship("Assignment", back_populates="excuse")
+
+    def __repr__(self):
+        return f"""Permission(
+                "id": {self.id},
+                "creator_id": {self.creator_id},
+                "assignment_id": {self.assignment_id},
+                "description": {self.description},
+                "validity": {self.validity},
+                "accepted": {self.accepted},
+            )"""
+
+
+class Submission(Base):
+    __tablename__ = "submission"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    assignment_id: Mapped[int] = mapped_column(ForeignKey("assignments.id"))
+    attachment: Mapped[str] = mapped_column(String, nullable=True)
+    note: Mapped[str] = mapped_column(String)
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+
+    # Many-to-One relationships
+    creator: Mapped["User"] = Relationship("User", back_populates="submission")
+    assignments: Mapped["Assignment"] = Relationship("Assignment", back_populates="submission")
+    feedback: Mapped["Feedback"] = Relationship("Feedback", back_populates="submission")
+
+    def __repr__(self):
+        return f"""Permission(
+                "id": {self.id},
+                "creator_id": {self.creator_id},
+                "assignment_id": {self.assignment_id},
+                "note": {self.note},
+                "attachment": {self.attachment},
+            )"""
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    submission_id: Mapped[int] = mapped_column(ForeignKey("submission.id"))
+    attachment: Mapped[str] = mapped_column(String, nullable=True)
+    score: Mapped[int] = mapped_column(Integer)  #############
+    note: Mapped[str] = mapped_column(String)
+    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+
+    # Many-to-One relationships
+    creator: Mapped["User"] = Relationship("User", back_populates="feedback")
+    submission: Mapped["Submission"] = Relationship("Submission", back_populates="feedback")
+
+    def __repr__(self):
+        return f"""Permission(
+                "id": {self.id},
+                "creator_id": {self.creator_id},
+                "submission_id": {self.submission_id},
+                "attachment": {self.attachment},
+                "score": {self.score},
+                "note": {self.note},
             )"""
