@@ -31,20 +31,21 @@ async def post_announcement(request: AnnouncementValidator, db: Session = Depend
 async def update_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                               _: User = Depends(get_current_user)):
     announcement = db.query(Announcement).filter_by(id=request.id).first()
-    if not announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
-    request.division = db.query(Division).filter_by(name=request.division).first()
-    if request.division:
-        announcement.update(**request.model_dump(exclude={"id"}))
-        db.commit()
-        return {"msg": "updates saved"}
-    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
+    if announcement:
+        request.division = db.query(Division).filter_by(name=request.division).first()
+        if request.division:
+            announcement.update(**request.model_dump(exclude={"id"}))
+            db.commit()
+            return {"msg": "updates saved"}
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
 
 
 @announcementsRouter.delete("/announcements")
 async def delete_announcement(announcement_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
     announcement = db.query(Announcement).filter_by(id=announcement_id).first()
     if announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
-    db.delete(announcement)
-    db.commit()
+        db.delete(announcement)
+        db.commit()
+        return {"msg": "announcement deleted"}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
