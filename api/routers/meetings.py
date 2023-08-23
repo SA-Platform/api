@@ -43,9 +43,9 @@ async def put_meeting(request: MeetingValidator, db: Session = Depends(get_db),
 
 @meetingsRouter.delete("/meetings")
 async def delete_meeting(meeting_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
-    announcement = db.query(Meeting).filter_by(id=meeting_id).first()
-    if announcement:
-        db.delete(announcement)
+    meeting = db.query(Meeting).filter_by(id=meeting_id).first()
+    if meeting:
+        db.delete(meeting)
         db.commit()
         return {"msg": "meeting deleted"}
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="meeting not found")
