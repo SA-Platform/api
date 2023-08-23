@@ -199,6 +199,13 @@ class Announcement(Base):
     division: Mapped["Division"] = Relationship("Division", back_populates="announcements")
     creator: Mapped["User"] = Relationship("User", back_populates="announcements")
 
+    def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime, division: Division) -> None:
+        self.title = title
+        self.description = description
+        self.category = category
+        self.date = date
+        self.division = division
+
     def __repr__(self):
         return f"""Permission(
                 "id": {self.id},
