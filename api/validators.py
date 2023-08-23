@@ -92,9 +92,9 @@ class MeetingValidator(BaseModel):
     title: str = Field(min_length=2)
     description: str = Field(min_length=2)
     date: datetime
-    location_text: str | None = Field(min_length=2)
-    location_lat: float = Field(ge=-90.0, le=90.0)
-    location_long: float = Field(ge=-180.0, le=180.0)
+    location_text: str | None = None
+    location_lat: float | None = None
+    location_long: float | None = None
     division: str = Field(min_length=2)
 
     @field_validator("date")

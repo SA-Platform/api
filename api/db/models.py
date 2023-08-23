@@ -158,15 +158,25 @@ class Meeting(Base):
     description: Mapped[str] = mapped_column(String(100))
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    location_text: Mapped[str] = mapped_column(String(100))
-    location_lat: Mapped[float] = mapped_column(Float)
-    location_long: Mapped[float] = mapped_column()
+    location_text: Mapped[str] = mapped_column(String(100), nullable=True)
+    location_lat: Mapped[float] = mapped_column(Float, nullable=True)
+    location_long: Mapped[float] = mapped_column(Float, nullable=True)
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
     division: Mapped["Division"] = Relationship("Division", back_populates="meetings")
     creator: Mapped["User"] = Relationship("User", back_populates="meetings")
+
+    def update(self, title: str, description: str, date: datetime, location_text: str | None,
+               location_lat: float | None, location_long: float | None, division: Division) -> None:
+        self.title = title
+        self.description = description
+        self.date = date
+        self.location_text = location_text
+        self.location_lat = location_lat
+        self.location_long = location_long
+        self.division = division
 
     def repr(self):
         return f"""Meeting(
@@ -198,6 +208,13 @@ class Announcement(Base):
     # One-to-Many relationships
     division: Mapped["Division"] = Relationship("Division", back_populates="announcements")
     creator: Mapped["User"] = Relationship("User", back_populates="announcements")
+
+    def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime, division: Division) -> None:
+        self.title = title
+        self.description = description
+        self.category = category
+        self.date = date
+        self.division = division
 
     def __repr__(self):
         return f"""Permission(
