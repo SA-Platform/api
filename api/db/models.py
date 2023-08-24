@@ -35,8 +35,8 @@ class User(Base):
     announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="creator")
     meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="creator")
     assignments: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="creator")
-    excuse: Mapped[List["Excuse"]] = Relationship("Excuse", back_populates="creator")
-    submission: Mapped[List["Submission"]] = Relationship("Submission", back_populates="creator")
+    excuses: Mapped[List["Excuse"]] = Relationship("Excuse", back_populates="creator")
+    submissions: Mapped[List["Submission"]] = Relationship("Submission", back_populates="creator")
     feedback: Mapped[List["Feedback"]] = Relationship("Feedback", back_populates="creator")
 
     def set_password(self, password) -> str:
@@ -251,8 +251,8 @@ class Assignment(Base):
     division: Mapped["Division"] = Relationship("Division", back_populates="assignments")
 
     # One-to-Many relationships
-    submission: Mapped["Submission"] = Relationship("Submission", back_populates="assignments")
-    excuse: Mapped["Excuse"] = Relationship("Excuse", back_populates="assignments")
+    submissions: Mapped["Submission"] = Relationship("Submission", back_populates="assignment")
+    excuses: Mapped["Excuse"] = Relationship("Excuse", back_populates="assignment")
 
     def update(self, title: str, description: str, deadline: datetime, attachment: str,
                weight: int, division: Division) -> None:
@@ -289,8 +289,8 @@ class Excuse(Base):
     accepted: Mapped[bool] = mapped_column(Boolean)
 
     # Many-to-one relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="excuse")
-    assignments: Mapped["Assignment"] = Relationship("Assignment", back_populates="excuse")
+    creator: Mapped["User"] = Relationship("User", back_populates="excuses")
+    assignment: Mapped["Assignment"] = Relationship("Assignment", back_populates="excuses")
 
     def __repr__(self):
         return f"""Permission(
@@ -314,8 +314,8 @@ class Submission(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # Many-to-One relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="submission")
-    assignments: Mapped["Assignment"] = Relationship("Assignment", back_populates="submission")
+    creator: Mapped["User"] = Relationship("User", back_populates="submissions")
+    assignment: Mapped["Assignment"] = Relationship("Assignment", back_populates="submissions")
     feedback: Mapped["Feedback"] = Relationship("Feedback", back_populates="submission")
 
     def __repr__(self):
