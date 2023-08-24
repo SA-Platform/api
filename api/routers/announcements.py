@@ -1,51 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from api.db.models import User, Announcement, Division
+from api.db.models import User, Announcement
 from api.dependencies import get_db, get_current_user
+from api.routers.features_base import Base
 from api.validators import AnnouncementValidator
 
-announcementsRouter: APIRouter = APIRouter(
-    tags=["Announcements"]
-)
+announcementsHandler = Base("announcement", "Announcements", AnnouncementValidator, Announcement)
+announcementsRouter = announcementsHandler.router
 
 
-@announcementsRouter.get("/announcements")
+@announcementsRouter.get(announcementsHandler.path)
 async def get_announcements(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
-    return db.query(Announcement).all()
+    return announcementsHandler.get_all(db)
 
 
-@announcementsRouter.post("/announcements")
+@announcementsRouter.post(announcementsHandler.path)
 async def post_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                             user: User = Depends(get_current_user)):
-    request.division = db.query(Division).filter_by(name=request.division).first()
-    if request.division:
-        new_announcement = Announcement(**request.model_dump(), creator=user)
-        db.add(new_announcement)
-        db.commit()
-        return {"msg": "announcement created"}
-    raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
+    return announcementsHandler.create(request, db, user)
 
 
-@announcementsRouter.put("/announcements")
+@announcementsRouter.put(announcementsHandler.path)
 async def update_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                               _: User = Depends(get_current_user)):
-    announcement = db.query(Announcement).filter_by(id=request.id).first()
-    if announcement:
-        request.division = db.query(Division).filter_by(name=request.division).first()
-        if request.division:
-            announcement.update(**request.model_dump(exclude={"id"}))
-            db.commit()
-            return {"msg": "updates saved"}
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    return announcementsHandler.update(request, db)
 
 
-@announcementsRouter.delete("/announcements")
+@announcementsRouter.delete(announcementsHandler.path)
 async def delete_announcement(announcement_id: int, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
-    announcement = db.query(Announcement).filter_by(id=announcement_id).first()
-    if announcement:
-        db.delete(announcement)
-        db.commit()
-        return {"msg": "announcement deleted"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    return announcementsHandler.delete(announcement_id, db)
