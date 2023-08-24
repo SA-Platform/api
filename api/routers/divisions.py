@@ -10,7 +10,7 @@ divisionsRouter: APIRouter = APIRouter(
 )
 
 
-@divisionsRouter.get("/divisions",)
+@divisionsRouter.get("/divisions", )
 async def get_divisions(db: Session = Depends(get_db),
                         _: User = Depends(get_current_user)):
     return db.query(Division).all()
@@ -30,11 +30,13 @@ async def create_division(request: DivisionValidator, db: Session = Depends(get_
 async def update_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: User = Depends(get_current_user)):
     division = db.query(Division).filter_by(id=request.id).first()  # fetch division to be edited
-    division.name = request.name  # set its name
-    division.parent = db.query(Division).filter_by(name=request.parent).first()  # set its parent
-    db.commit()
-    db.refresh(division)
-    return division
+    if division:
+        division.name = request.name  # set its name
+        division.parent = db.query(Division).filter_by(name=request.parent).first()  # set its parent
+        db.commit()
+        db.refresh(division)
+        return {"msg": "updates saved"}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")
 
 
 @divisionsRouter.delete("/divisions")
