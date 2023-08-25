@@ -26,7 +26,7 @@ class User(Base):
     university: Mapped[str] = mapped_column(String)
     faculty_department: Mapped[str] = mapped_column(String)
     graduation_year: Mapped[int] = mapped_column(Integer)
-    image_file: Mapped[str] = mapped_column(String)
+    image_file: Mapped[str] = mapped_column(String, nullable=True)
     bio: Mapped[str] = mapped_column(String, nullable=True)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
@@ -49,7 +49,7 @@ class User(Base):
     def __init__(self, first_name: str, last_name: str, birthdate: datetime.datetime,
                  phone_number: str, email: str, username: str, password: str,
                  faculty: str, university: str, faculty_department: str,
-                 graduation_year: int, image_file: str, bio: str = None) -> None:
+                 graduation_year: int, image_file: str | None = None, bio: str | None = None) -> None:
         self.first_name = first_name
         self.last_name = last_name
         self.birthdate = birthdate
