@@ -47,7 +47,7 @@ class UserValidator(BaseModel):
                 "first_name": "John",
                 "last_name": "Jacky",
                 "birthdate": "2023-04-24T22:01:32.904Z",
-                "phone_number": "01555555555",
+                "phone_number": "01234567891",
                 "email": "user@example.com",
                 "username": "j3uvaobz",
                 "password": "stringst",
