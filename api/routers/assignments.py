@@ -2,7 +2,8 @@ from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 
 from api.dependencies import get_current_user, get_db
-from api.db.models import User, Assignment
+from api.db.models.core_models import User
+from api.db.models.feature_models import Assignment
 from api.validators import AssignmentValidator
 
 from api.routers.features_base import Base

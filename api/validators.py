@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from api.const import AnnouncementsCategory
 
-from api.db.models import Division
+from api.db.models.core_models import Division
 from api.dependencies import get_db
 
 

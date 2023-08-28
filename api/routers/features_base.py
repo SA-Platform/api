@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, Mapper, DeclarativeBase
 from starlette import status
 
-from api.db.models import Division
+from api.db.models.core_models import Division
 
 
 class Base:

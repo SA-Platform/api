@@ -1,7 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from api.db.models import User, Announcement
+from api.db.models.core_models import User
+from api.db.models.feature_models import Announcement
 from api.dependencies import get_db, get_current_user
 from api.routers.features_base import Base
 from api.validators import AnnouncementValidator

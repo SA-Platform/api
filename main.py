@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from api.routers import divisions, announcements, users, meetings, assignments
 from fastapi.middleware.cors import CORSMiddleware
 
