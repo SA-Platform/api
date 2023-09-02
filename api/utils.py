@@ -4,7 +4,7 @@ from datetime import timedelta
 from jose import jwt, JWTError
 
 from email.message import EmailMessage
-import ssl 
+import ssl
 import smtplib
 
 SECRET_KEY = "1e0788a28e2e503315a3a894d353abaa36ace075faae8650f714d7c880f01da5"
@@ -32,13 +32,13 @@ def decode_token(token):
 
 """email_token_password : Not your gmail password, It's a password you generate from your gmail settings"""
 
+
 def email_sender_for_pass_reset(email_sender, email_token_password, email_receiver):
     subject = "Reseting Password"
-    
+
     # Read the HTML content from the template file
     with open('./resources/index.html', 'r') as html_file:
         body = html_file.read()
-
 
     em = EmailMessage()
     em['From'] = email_sender
@@ -48,6 +48,6 @@ def email_sender_for_pass_reset(email_sender, email_token_password, email_receiv
 
     context = ssl.create_default_context()
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context = context) as smtp:
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
         smtp.login(email_sender, email_token_password)
         smtp.sendmail(email_sender, email_receiver, em.as_string())

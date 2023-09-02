@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from api.const import AnnouncementsCategory
 
-from api.db.models.core_models import Division
+from api.db.models.core_models import DivisionModel
 from api.dependencies import get_db
 
 
@@ -133,8 +133,8 @@ class DivisionValidator(BaseModel):
     @model_validator(mode="after")
     def division_exists(self) -> "DivisionValidator":
         db: Session = next(get_db())
-        division = db.query(Division).filter_by(name=self.name).first()
-        parent = db.query(Division).filter_by(name=self.parent).first()
+        division = db.query(DivisionModel).filter_by(name=self.name).first()
+        parent = db.query(DivisionModel).filter_by(name=self.parent).first()
         if self.name == self.parent:
             raise ValueError("division can't be its own parent")
         elif self.parent:
@@ -150,7 +150,7 @@ class DivisionValidator(BaseModel):
             if division:
                 raise ValueError(f"division {division.name} already exists")
             elif not self.id:
-                root = db.query(Division).filter_by(parent=None).first()
+                root = db.query(DivisionModel).filter_by(parent=None).first()
                 if root:
                     raise ValueError(f"only one root division is allowed, which is {root.name}")
             return self
