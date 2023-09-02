@@ -7,12 +7,12 @@ from starlette import status
 
 from api.db.models.core_models import UserModel, DivisionModel
 from api.db.models.feature_models import AssignmentModel, MeetingModel, AnnouncementModel
-from api.validators import UserValidator, AssignmentValidator
+from api.validators import UserValidator, AssignmentValidator, DivisionValidator, AnnouncementValidator, \
+    MeetingValidator
 
 
-class Base(ABC):
-    """Base class for all features, contains the basic CRUD operations"""
-    name: str
+class CoreBase(ABC):
+    """Base class for all core entities, contains the basic CRUD operations"""
     tag: str
     path: str
     router: APIRouter
@@ -62,7 +62,8 @@ class Base(ABC):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.name} not found")
 
 
-class FeatureBase(Base):
+class FeatureBase(CoreBase):
+    """Base class for all feature entities, contains the basic CRUD operations inherited from CoreBase"""
 
     @classmethod
     def create(cls, request: BaseModel, db: Session, user: UserModel) -> dict:
@@ -87,8 +88,7 @@ class FeatureBase(Base):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.name} not found")
 
 
-class User(Base):
-    name = "User"
+class User(CoreBase):
     tag = "Users"
     path = "/users"
     router = APIRouter(tags=[tag])
@@ -101,7 +101,6 @@ class User(Base):
 
 
 class Assignment(FeatureBase):
-    name = "Assignment"
     tag = "Assignments"
     path = "/assignments"
     router = APIRouter(tags=[tag])
@@ -110,19 +109,25 @@ class Assignment(FeatureBase):
 
 
 class Meeting(FeatureBase):
-    name = "Meeting"
     tag = "Meetings"
     path = "/meetings"
     router = APIRouter(tags=[tag])
-    validator = UserValidator
+    validator = MeetingValidator
     db_model = MeetingModel
 
 
 class Announcement(FeatureBase):
-    name = "Announcement"
     tag = "Announcements"
     path = "/announcements"
     router = APIRouter(tags=[tag])
-    validator = UserValidator
+    validator = AnnouncementValidator
     db_model = AnnouncementModel
+
+
+class Division(CoreBase):
+    tag = "Divisions"
+    path = "/divisions"
+    router = APIRouter(tags=[tag])
+    validator = DivisionValidator
+    db_model = DivisionModel
 

@@ -4,19 +4,19 @@ from sqlalchemy.orm import Session
 from api.dependencies import get_current_user, get_db
 from api.validators import DivisionValidator
 from api.db.models.core_models import UserModel, DivisionModel
-
-divisionsRouter: APIRouter = APIRouter(
-    tags=["Division"]
-)
+from api.routers.features_base import Division
 
 
-@divisionsRouter.get("/divisions", )
+divisionsRouter: APIRouter = Division.router
+
+
+@divisionsRouter.get(Division.path, )
 async def get_divisions(db: Session = Depends(get_db),
                         _: UserModel = Depends(get_current_user)):
-    return db.query(DivisionModel).all()
+    return Division.get_db_dump(db)
 
 
-@divisionsRouter.post("/divisions", status_code=status.HTTP_201_CREATED)
+@divisionsRouter.post(Division.path, status_code=status.HTTP_201_CREATED)
 async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: UserModel = Depends(get_current_user)):
     new_division: DivisionModel = DivisionModel(name=request.name,
@@ -26,7 +26,7 @@ async def create_division(request: DivisionValidator, db: Session = Depends(get_
     return new_division
 
 
-@divisionsRouter.put("/divisions")
+@divisionsRouter.put(Division.path)
 async def update_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: UserModel = Depends(get_current_user)):
     division = db.query(DivisionModel).filter_by(id=request.id).first()  # fetch division to be edited
@@ -39,11 +39,6 @@ async def update_division(request: DivisionValidator, db: Session = Depends(get_
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")
 
 
-@divisionsRouter.delete("/divisions")
+@divisionsRouter.delete(Division.path)
 async def delete_division(division_id: int, db: Session = Depends(get_db), _: UserModel = Depends(get_current_user)):
-    division = db.query(DivisionModel).filter_by(id=division_id).first()
-    if division:
-        db.delete(division)
-        db.commit()
-        return {"message": "division deleted successfully"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")
+    return Division.delete(division_id, db)
