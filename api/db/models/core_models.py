@@ -8,11 +8,11 @@ from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from api.db.models.base import Base
 
 if TYPE_CHECKING:
-    from api.db.models.feature_models import Announcement, Meeting, Assignment
-    from api.db.models.sub_models import Submission, Excuse, Feedback
+    from api.db.models.feature_models import AnnouncementModel, MeetingModel, AssignmentModel
+    from api.db.models.sub_models import SubmissionModel, ExcuseModel, FeedbackModel
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -33,12 +33,12 @@ class User(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # One-to-Many relationships
-    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="creator")
-    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="creator")
-    assignments: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="creator")
-    excuses: Mapped[List["Excuse"]] = Relationship("Excuse", back_populates="creator")
-    submissions: Mapped[List["Submission"]] = Relationship("Submission", back_populates="creator")
-    feedback: Mapped[List["Feedback"]] = Relationship("Feedback", back_populates="creator")
+    announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="creator", cascade="all, delete-orphan")
+    meetings: Mapped[List["MeetingModel"]] = Relationship("MeetingModel", back_populates="creator", cascade="all, delete-orphan")
+    assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="creator", cascade="all, delete-orphan")
+    excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="creator", cascade="all, delete-orphan")
+    submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="creator", cascade="all, delete-orphan")
+    feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="creator", cascade="all, delete-orphan")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -86,7 +86,7 @@ class User(Base):
         )"""
 
 
-class Permission(Base):
+class PermissionModel(Base):
     __tablename__ = 'permissions'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -102,7 +102,7 @@ class Permission(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
 
     # One-to-One relationships
-    role: Mapped["Role"] = Relationship("Role", back_populates="permissions")
+    role: Mapped["Role"] = Relationship("RoleModel", back_populates="permissions")
 
     def __repr__(self):
         return f"""Permission(
@@ -120,14 +120,14 @@ class Permission(Base):
         )"""
 
 
-class Role(Base):
+class RoleModel(Base):
     __tablename__ = 'roles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30), unique=True)
 
     # One-to-One relationships
-    permissions: Mapped["Permission"] = Relationship("Permission", back_populates="role")
+    permissions: Mapped["PermissionModel"] = Relationship("PermissionModel", back_populates="role")
 
     def __repr__(self):
         return f"""Role(
@@ -136,7 +136,7 @@ class Role(Base):
         )"""
 
 
-class Division(Base):
+class DivisionModel(Base):
     __tablename__ = "divisions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -144,11 +144,11 @@ class Division(Base):
     parent_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"), nullable=True)
 
     # One-to-Many relationships
-    subdivisions: Mapped[List["Division"]] = Relationship("Division", back_populates="parent")
-    parent: Mapped["Division"] = Relationship("Division", back_populates="subdivisions", remote_side=[id])
-    announcements: Mapped[List["Announcement"]] = Relationship("Announcement", back_populates="division")
-    meetings: Mapped[List["Meeting"]] = Relationship("Meeting", back_populates="division")
-    assignments: Mapped[List["Assignment"]] = Relationship("Assignment", back_populates="division")
+    subdivisions: Mapped[List["DivisionModel"]] = Relationship("DivisionModel", back_populates="parent")
+    parent: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="subdivisions", remote_side=[id])
+    announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="division")
+    meetings: Mapped[List["MeetingModel"]] = Relationship("MeetingModel", back_populates="division")
+    assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""

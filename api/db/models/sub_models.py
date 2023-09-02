@@ -7,11 +7,11 @@ from sqlalchemy.orm import mapped_column, Mapped, Relationship
 from api.db.models.base import Base
 
 if TYPE_CHECKING:
-    from api.db.models.feature_models import Assignment
-    from api.db.models.core_models import User
+    from api.db.models.feature_models import AssignmentModel
+    from api.db.models.core_models import UserModel
 
 
-class Submission(Base):
+class SubmissionModel(Base):
     __tablename__ = "submission"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -22,9 +22,9 @@ class Submission(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # Many-to-One relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="submissions")
-    assignment: Mapped["Assignment"] = Relationship("Assignment", back_populates="submissions")
-    feedback: Mapped["Feedback"] = Relationship("Feedback", back_populates="submission")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="submissions")
+    assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="submissions")
+    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission")
 
     def __repr__(self):
         return f"""Permission(
@@ -36,7 +36,7 @@ class Submission(Base):
             )"""
 
 
-class Excuse(Base):
+class ExcuseModel(Base):
     __tablename__ = "excuse"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -48,8 +48,8 @@ class Excuse(Base):
     accepted: Mapped[bool] = mapped_column(Boolean)
 
     # Many-to-one relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="excuses")
-    assignment: Mapped["Assignment"] = Relationship("Assignment", back_populates="excuses")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="excuses")
+    assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="excuses")
 
     def __repr__(self):
         return f"""Permission(
@@ -62,7 +62,7 @@ class Excuse(Base):
             )"""
 
 
-class Feedback(Base):
+class FeedbackModel(Base):
     __tablename__ = "feedback"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -74,8 +74,8 @@ class Feedback(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
 
     # Many-to-One relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="feedback")
-    submission: Mapped["Submission"] = Relationship("Submission", back_populates="feedback")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="feedback")
+    submission: Mapped["SubmissionModel"] = Relationship("SubmissionModel", back_populates="feedback")
 
     def __repr__(self):
         return f"""Permission(

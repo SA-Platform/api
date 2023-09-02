@@ -8,11 +8,11 @@ from api.const import AnnouncementsCategory
 from api.db.models.base import Base
 
 if TYPE_CHECKING:
-    from api.db.models.core_models import User, Division
-    from api.db.models.sub_models import Submission, Excuse
+    from api.db.models.core_models import UserModel, DivisionModel
+    from api.db.models.sub_models import SubmissionModel, ExcuseModel
 
 
-class Assignment(Base):
+class AssignmentModel(Base):
     __tablename__ = "assignments"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -26,15 +26,15 @@ class Assignment(Base):
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
-    creator: Mapped["User"] = Relationship("User", back_populates="assignments")
-    division: Mapped["Division"] = Relationship("Division", back_populates="assignments")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="assignments")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="assignments")
 
     # One-to-Many relationships
-    submissions: Mapped["Submission"] = Relationship("Submission", back_populates="assignment")
-    excuses: Mapped["Excuse"] = Relationship("Excuse", back_populates="assignment")
+    submissions: Mapped["SubmissionModel"] = Relationship("SubmissionModel", back_populates="assignment")
+    excuses: Mapped["ExcuseModel"] = Relationship("ExcuseModel", back_populates="assignment")
 
     def update(self, title: str, description: str, deadline: datetime,
-               weight: int, division: "Division", attachment: str | None = None) -> None:
+               weight: int, division: "DivisionModel", attachment: str | None = None) -> None:
         self.title = title
         self.description = description
         self.deadline = deadline
@@ -56,7 +56,7 @@ class Assignment(Base):
             )"""
 
 
-class Announcement(Base):
+class AnnouncementModel(Base):
     __tablename__ = "announcements"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -69,11 +69,11 @@ class Announcement(Base):
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # One-to-Many relationships
-    division: Mapped["Division"] = Relationship("Division", back_populates="announcements")
-    creator: Mapped["User"] = Relationship("User", back_populates="announcements")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="announcements")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="announcements")
 
     def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime,
-               division: "Division") -> None:
+               division: "DivisionModel") -> None:
         self.title = title
         self.description = description
         self.category = category
@@ -93,7 +93,7 @@ class Announcement(Base):
             )"""
 
 
-class Meeting(Base):
+class MeetingModel(Base):
     __tablename__ = 'meetings'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,11 +108,11 @@ class Meeting(Base):
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
-    division: Mapped["Division"] = Relationship("Division", back_populates="meetings")
-    creator: Mapped["User"] = Relationship("User", back_populates="meetings")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="meetings")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="meetings")
 
     def update(self, title: str, description: str, date: datetime, location_text: str | None,
-               location_lat: float | None, location_long: float | None, division: "Division") -> None:
+               location_lat: float | None, location_long: float | None, division: "DivisionModel") -> None:
         self.title = title
         self.description = description
         self.date = date
