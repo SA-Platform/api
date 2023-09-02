@@ -13,6 +13,7 @@ from api.validators import UserValidator, AssignmentValidator, DivisionValidator
 
 class CoreBase(ABC):
     """Base class for all core entities, contains the basic CRUD operations"""
+    name: str
     tag: str
     path: str
     router: APIRouter
@@ -50,7 +51,7 @@ class CoreBase(ABC):
             db.commit()
             db.refresh(model)
             return model
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.name} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
 
     @classmethod
     def delete(cls, model_id: int, db: Session, user: UserModel | None = None) -> dict:
@@ -58,8 +59,8 @@ class CoreBase(ABC):
         if model:
             db.delete(model)
             db.commit()
-            return {"msg": f"{cls.name} deleted"}
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.name} not found")
+            return {"msg": f"{cls.tag.lower()} deleted"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
 
 
 class FeatureBase(CoreBase):
@@ -72,7 +73,7 @@ class FeatureBase(CoreBase):
             new_model = cls.db_model(**request.model_dump(), creator=user)
             db.add(new_model)
             db.commit()
-            return {"msg": f"{cls.name} created"}
+            return {"msg": f"{cls.tag.lower()} created"}
         raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
 
     @classmethod
@@ -85,7 +86,7 @@ class FeatureBase(CoreBase):
                 db.commit()
                 return {"msg": "updates saved"}
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.name} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
 
 
 class User(CoreBase):
@@ -97,7 +98,8 @@ class User(CoreBase):
 
     @classmethod
     def get_db_username_or_email(cls, db: Session, username: str):
-        return db.query(cls.db_model).filter((cls.db_model.email == username) | (cls.db_model.username == username)).first()
+        return db.query(cls.db_model).filter(
+            (cls.db_model.email == username) | (cls.db_model.username == username)).first()
 
 
 class Assignment(FeatureBase):
@@ -130,4 +132,3 @@ class Division(CoreBase):
     router = APIRouter(tags=[tag])
     validator = DivisionValidator
     db_model = DivisionModel
-
