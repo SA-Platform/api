@@ -206,3 +206,69 @@ class AssignmentValidator(BaseModel):
                 "division": "CS",
             }
         }
+
+
+class ExcuseValidator(BaseModel):
+    id: int | None = None
+    title: str = Field(min_length=2, strip_whitespace=True)
+    description: str = Field(min_length=2, strip_whitespace=True)
+    validity: datetime
+    accepted: bool
+
+    @field_validator("validity")
+    def validate_date_future(cls, v: datetime) -> datetime:
+        if v < datetime.now(timezone.utc):
+            raise ValueError("date must be in the future")
+        return v
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "this is an assignment",
+                "description": "this is really an assignment",
+                "validity": "2025-04-24T22:01:32.904Z",
+                "accepted": "True",
+            }
+        }
+
+
+class SubmissionValidator(BaseModel):
+    id: int | None = None
+    attachment: str = Field(min_length=2, strip_whitespace=True)
+    note: str = Field(min_length=2, strip_whitespace=True)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "attachment": r"C:\Users\amr\Desktop\api",
+                "note": "this is really an submission",
+            }
+        }
+
+
+class FeedbackValidator(BaseModel):
+    id: int | None = None
+    attachment: str = Field(min_length=2, strip_whitespace=True)
+    score: int = Field(gt=0)
+    note: str = Field(min_length=2, strip_whitespace=True)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "attachment": "this is an feedback",
+                "score": 20,
+                "note": "this is really a feedback",
+            }
+        }
+
+
+class RoleValidator(BaseModel):
+    id: int | None = None
+    name: str = Field(min_length=2, strip_whitespace=True)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "chairman",
+            }
+        }
