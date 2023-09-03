@@ -2,13 +2,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, Mapper, DeclarativeBase
 from abc import ABC
-from typing import Optional
 from starlette import status
 
-from api.db.models.core_models import UserModel, DivisionModel
-from api.db.models.feature_models import AssignmentModel, MeetingModel, AnnouncementModel
-from api.validators import UserValidator, AssignmentValidator, DivisionValidator, AnnouncementValidator, \
-    MeetingValidator
+import api.db.models.core_models as core_models
+import api.db.models.feature_models as feature_models
+import api.db.models.sub_models as sub_models
+import api.validators as validators
 
 
 class CoreBase(ABC):
@@ -37,14 +36,14 @@ class CoreBase(ABC):
         return db.query(cls.db_model).all()
 
     @classmethod
-    def create(cls, request: BaseModel, db: Session, user: UserModel | None = None) -> Mapper:
+    def create(cls, request: BaseModel, db: Session, user: core_models.UserModel | None = None) -> Mapper:
         new_model = cls.db_model(**request.model_dump())
         db.add(new_model)
         db.commit()
         return new_model
 
     @classmethod
-    def update(cls, request: BaseModel, db: Session, user: UserModel | None) -> Mapper:
+    def update(cls, request: BaseModel, db: Session, user: core_models.UserModel | None) -> Mapper:
         model = cls.get_db_first(db, "id", request.id)
         if model:
             model.update(**request.model_dump(exclude={"id"}))
@@ -54,7 +53,7 @@ class CoreBase(ABC):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
 
     @classmethod
-    def delete(cls, model_id: int, db: Session, user: UserModel | None = None) -> dict:
+    def delete(cls, model_id: int, db: Session, user: core_models.UserModel | None = None) -> dict:
         model = cls.get_db_first(db, "id", model_id)
         if model:
             db.delete(model)
@@ -67,8 +66,8 @@ class FeatureBase(CoreBase):
     """Base class for all feature entities, contains the basic CRUD operations inherited from CoreBase"""
 
     @classmethod
-    def create(cls, request: BaseModel, db: Session, user: UserModel) -> dict:
-        request.division = db.query(DivisionModel).filter_by(name=request.division).first()
+    def create(cls, request: BaseModel, db: Session, user: core_models.UserModel) -> dict:
+        request.division = db.query(core_models.DivisionModel).filter_by(name=request.division).first()
         if request.division:
             new_model = cls.db_model(**request.model_dump(), creator=user)
             db.add(new_model)
@@ -77,10 +76,10 @@ class FeatureBase(CoreBase):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
 
     @classmethod
-    def update(cls, request: BaseModel, db: Session, user: UserModel | None = None) -> dict:
+    def update(cls, request: BaseModel, db: Session, user: core_models.UserModel | None = None) -> dict:
         model = db.query(cls.db_model).filter_by(id=request.id).first()
         if model:
-            request.division = db.query(DivisionModel).filter_by(name=request.division).first()
+            request.division = db.query(core_models.DivisionModel).filter_by(name=request.division).first()
             if request.division:
                 model.update(**request.model_dump(exclude={"id"}))
                 db.commit()
@@ -93,8 +92,8 @@ class User(CoreBase):
     tag = "Users"
     path = "/users"
     router = APIRouter(tags=[tag])
-    validator = UserValidator
-    db_model = UserModel
+    validator = validators.UserValidator
+    db_model = core_models.UserModel
 
     @classmethod
     def get_db_username_or_email(cls, db: Session, username: str):
@@ -106,29 +105,53 @@ class Assignment(FeatureBase):
     tag = "Assignments"
     path = "/assignments"
     router = APIRouter(tags=[tag])
-    validator = AssignmentValidator
-    db_model = AssignmentModel
+    validator = validators.AssignmentValidator
+    db_model = feature_models.AssignmentModel
 
 
 class Meeting(FeatureBase):
     tag = "Meetings"
     path = "/meetings"
     router = APIRouter(tags=[tag])
-    validator = MeetingValidator
-    db_model = MeetingModel
+    validator = validators.MeetingValidator
+    db_model = feature_models.MeetingModel
 
 
 class Announcement(FeatureBase):
     tag = "Announcements"
     path = "/announcements"
     router = APIRouter(tags=[tag])
-    validator = AnnouncementValidator
-    db_model = AnnouncementModel
+    validator = validators.AnnouncementValidator
+    db_model = feature_models.AnnouncementModel
 
 
 class Division(CoreBase):
     tag = "Divisions"
     path = "/divisions"
     router = APIRouter(tags=[tag])
-    validator = DivisionValidator
-    db_model = DivisionModel
+    validator = validators.DivisionValidator
+    db_model = core_models.DivisionModel
+
+
+class Excuse(FeatureBase):
+    tag = "Excuses"
+    path = "/excuses"
+    router = APIRouter(tags=[tag])
+    validator = validators.ExcuseValidator
+    db_model = sub_models.ExcuseModel
+
+
+class Feedback(FeatureBase):
+    tag = "feedback"
+    path = "/feedback"
+    router = APIRouter(tags=[tag])
+    validator = validators.FeedbackValidator
+    db_model = sub_models.FeedbackModel
+
+
+class Role(FeatureBase):
+    tag = "Roles"
+    path = "/roles"
+    router = APIRouter(tags=[tag])
+    validator = validators.RoleValidator
+    db_model = core_models.RoleModel
