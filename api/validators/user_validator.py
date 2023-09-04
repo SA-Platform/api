@@ -25,13 +25,12 @@ class UserValidator(BaseModel):
                 "birthdate": "2023-04-24T22:01:32.904Z",
                 "phone_number": "01234567891",
                 "email": "user@example.com",
-                "username": "j3uvaobz",
+                "username": {"username": "j3uvaobz"},
                 "password": "stringst",
                 "bio": "hello I am there",
                 "faculty": "engineering",
                 "university": "zagmansoura",
                 "faculty_department": "electrical",
-                "graduation_year": "2025",
+                "graduation_year": "2025"
             }
         }
-
