@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from api.dependencies import get_current_user, get_db
 from api.db.models import UserModel  # unresolved reference ignored
-from api.routers.features_base import Assignment
+from api.routes.features_base import Assignment
 
 assignmentsRouter = APIRouter(
     tags=["Assignments"]

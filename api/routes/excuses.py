@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from api.db.models import UserModel   # unresolved reference ignored
 from api.dependencies import get_db, get_current_user
-from api.routers.features_base import Excuse
+from api.routes.features_base import Excuse
 
 excusesRouter = APIRouter(
     tags=["Excuses"]

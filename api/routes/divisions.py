@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.dependencies import get_current_user, get_db
 from api.db.models import UserModel, DivisionModel  # unresolved reference ignored
 from api.validators import DivisionValidator
-from api.routers.features_base import Division
+from api.routes.features_base import Division
 
 divisionsRouter = APIRouter(
     tags=["Divisions"]

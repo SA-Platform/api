@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routers import divisions, announcements, users, meetings, assignments, excuses
+from api.routes import divisions, announcements, users, meetings, assignments, excuses
 from fastapi.middleware.cors import CORSMiddleware
 app: FastAPI = FastAPI()
 
