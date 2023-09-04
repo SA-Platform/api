@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from api.db import SessionLocal
-from api.db.models.core_models import UserModel
+from api.db.models import UserModel  # unresolved reference ignored
 from api.utils import decode_token
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/signin")
 
