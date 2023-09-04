@@ -1,32 +1,33 @@
-from fastapi import Depends
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from api.db.models.core_models import UserModel
+from api.db.models import UserModel   # unresolved reference ignored
 from api.dependencies import get_db, get_current_user
 from api.routers.features_base import Excuse
-from api.validators import ExcuseValidator
 
-excusesRouter = Excuse.router
+excusesRouter = APIRouter(
+    tags=["Excuses"]
+)
 
 
-@excusesRouter.get(Excuse.path)
+@excusesRouter.get("/excuses")
 async def get_excuses(db: Session = Depends(get_db), _: UserModel = Depends(get_current_user)):
     return Excuse.get_db_dump(db)
 
 
-@excusesRouter.post(Excuse.path)
-async def post_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
+@excusesRouter.post("/excuses")
+async def post_excuse(request: Excuse.validator, db: Session = Depends(get_db),
                       user: UserModel = Depends(get_current_user)):
     return Excuse.create(request, db, user)
 
 
-@excusesRouter.put(Excuse.path)
-async def update_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
+@excusesRouter.put("/excuses")
+async def update_excuse(request: Excuse.validator, db: Session = Depends(get_db),
                         _: UserModel = Depends(get_current_user)):
     return Excuse.update(request, db)
 
 
-@excusesRouter.delete(Excuse.path)
+@excusesRouter.delete("/excuses")
 async def delete_excuse(excuse_id: int, db: Session = Depends(get_db),
                         _: UserModel = Depends(get_current_user)):
     return Excuse.delete(excuse_id, db)
