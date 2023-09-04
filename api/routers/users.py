@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from api.routers.features_base import User
 from api.dependencies import get_db, get_current_user
 from api.utils import create_token
-from api.validators import UserValidator, UsernameValidator, HTTPError
+from api.validators import UsernameValidator, HTTPErrorValidator
 
 usersRouter: APIRouter = APIRouter(
     prefix="/users",
@@ -19,10 +19,10 @@ async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current
 
 
 @usersRouter.post("/signup", status_code=status.HTTP_201_CREATED)
-async def signup(request: UserValidator, db: Session = Depends(get_db)):
+async def signup(request: User.validator, db: Session = Depends(get_db)):
     if User.get_db_first(db, "email", request.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
-
+    User.validate_username(db, request.username)
     User.create(request, db)
     return {"access_token": create_token({"username": request.username}), "token_type": "bearer"}
 
@@ -41,10 +41,9 @@ async def signin(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
 
 @usersRouter.post("/check-username",
                   responses={
-                      status.HTTP_409_CONFLICT: {"model": HTTPError, "description": "username not available"}
+                      status.HTTP_409_CONFLICT: {"model": HTTPErrorValidator, "description": "username not available"}
                   })
-async def validate_username(request: UsernameValidator, db: Session = Depends(get_db)):  ##### need to change the validation error msg
-    existing_user = User.get_db_first(db, "username", request.username)
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="username is taken")
+async def validate_username(request: UsernameValidator,
+                            db: Session = Depends(get_db)):  ##### need to change the validation error msg
+    User.validate_username(db, request.username)
     return {"message": "username is available"}
