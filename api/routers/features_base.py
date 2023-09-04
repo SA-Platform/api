@@ -84,7 +84,7 @@ class FeatureBase(CoreBase):
     def update(cls, model_id: int, request: BaseModel, db: Session, user: UserModel | None = None) -> dict:
         model = db.query(cls.db_model).filter_by(id=model_id).first()
         if model:
-            request.division = db.query(core_models.DivisionModel).filter_by(name=request.division).first()
+            request.division = db.query(DivisionModel).filter_by(name=request.division).first()
             if request.division:
                 model.update(**request.model_dump())
                 db.commit()
@@ -115,8 +115,8 @@ class Division(CoreBase):
 
     @classmethod
     def check_division_validity(cls, request: DivisionValidator, db: Session, division_id: int = None) -> None:
-        division = db.query(DivisionModel).filter_by(name=request.name).first()
-        parent = db.query(DivisionModel).filter_by(name=request.parent).first()
+        division = cls.get_db_first(db, "name", request.name)
+        parent = cls.get_db_first(db, "name", request.parent)
         if request.name == request.parent:
             raise HTTPException(status.HTTP_409_CONFLICT, detail="division can't be its own parent")
         elif request.parent:
