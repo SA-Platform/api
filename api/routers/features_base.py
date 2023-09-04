@@ -9,13 +9,15 @@ from api.db.models import (UserModel,
                            DivisionModel,
                            AssignmentModel,
                            MeetingModel,
-                           AnnouncementModel)
+                           AnnouncementModel,
+                           ExcuseModel)
 
 from api.validators import (UserValidator,
                             AssignmentValidator,
                             DivisionValidator,
                             AnnouncementValidator,
-                            MeetingValidator)
+                            MeetingValidator,
+                            ExcuseValidator)
 
 
 class CoreBase(ABC):
@@ -58,7 +60,7 @@ class CoreBase(ABC):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.__name__.lower()} not found")
 
     @classmethod
-    def delete(cls, model_id: int, db: Session, user: core_models.UserModel | None = None) -> dict:
+    def delete(cls, model_id: int, db: Session, user: UserModel | None = None) -> dict:
         model = cls.get_db_first(db, "id", model_id)
         if model:
             db.delete(model)
@@ -151,3 +153,8 @@ class Meeting(FeatureBase):
 class Announcement(FeatureBase):
     validator = AnnouncementValidator
     db_model = AnnouncementModel
+
+
+class Excuse(FeatureBase):
+    validator = ExcuseValidator
+    db_model = ExcuseModel
