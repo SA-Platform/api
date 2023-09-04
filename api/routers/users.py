@@ -22,6 +22,7 @@ async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current
 async def signup(request: User.validator, db: Session = Depends(get_db)):
     if User.get_db_first(db, "email", request.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
+    request.username = request.username.username
     User.validate_username(db, request.username)
     User.create(request, db)
     return {"access_token": create_token({"username": request.username}), "token_type": "bearer"}
