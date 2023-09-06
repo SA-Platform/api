@@ -22,7 +22,7 @@ async def post_meeting(request: Meeting.validator, db: Session = Depends(get_db)
 
 
 @meetingsRouter.put("/meetings/{meeting_id}")
-async def put_meeting(meeting_id: int, request: Meeting.validator, db: Session = Depends(get_db),
+async def update_meeting(meeting_id: int, request: Meeting.validator, db: Session = Depends(get_db),
                       _: UserModel = Depends(get_current_user)):
     return Meeting.update(meeting_id, request, db)
 
