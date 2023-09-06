@@ -47,6 +47,7 @@ class CoreBase(ABC):
         new_model = cls.db_model(**request.model_dump(), **kwargs)
         db.add(new_model)
         db.commit()
+        db.refresh(new_model)
         return new_model
 
     @classmethod
