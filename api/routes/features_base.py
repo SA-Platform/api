@@ -54,7 +54,7 @@ class CoreBase(ABC):
     def update(cls, model_id: int, request: BaseModel, db: Session, **kwargs) -> Mapper:
         model = cls.get_db_first(db, "id", model_id)
         if model:
-            model.update(**request.model_dump(), **kwargs)
+            cls.db_update(model, **request.model_dump(), **kwargs)
             db.commit()
             db.refresh(model)
             return model
@@ -69,29 +69,11 @@ class CoreBase(ABC):
             return {"msg": f"{cls.__name__.lower()} deleted"}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.__name__.lower()} not found")
 
-
-class FeatureBase(CoreBase):
-    """Base class for all feature entities, contains the basic CRUD operations inherited from CoreBase"""
-
     @classmethod
-    def create(cls, request: BaseModel, db: Session, user: UserModel) -> Mapper:
-        print(request.division)
-        request.division = db.query(DivisionModel).filter_by(name=request.division).first()
-        if request.division:
-            return super().create(request, db, creator=user)
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
-
-    @classmethod
-    def update(cls, model_id: int, request: BaseModel, db: Session, user: UserModel | None = None) -> dict:
-        model = db.query(cls.db_model).filter_by(id=model_id).first()
-        if model:
-            request.division = db.query(DivisionModel).filter_by(name=request.division).first()
-            if request.division:
-                model.update(**request.model_dump())
-                db.commit()
-                return {"msg": "updates saved"}
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
+    def db_update(cls, model_instance, **kwargs):
+        """this method is used to update a model instance without committing to the database"""
+        for key, value in kwargs.items():
+            setattr(model_instance, key, value)
 
 
 class User(CoreBase):
