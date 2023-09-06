@@ -96,7 +96,7 @@ class Division(CoreBase):
     db_model = DivisionModel
 
     @classmethod
-    def check_division_validity(cls, request: DivisionValidator, db: Session, division_id: int = None) -> None:
+    def check_division_validity(cls, request: DivisionValidator, db: Session, division_id: int | None = None) -> None:
         division = cls.get_db_first(db, "name", request.name)
         parent = cls.get_db_first(db, "name", request.parent)
         if request.name == request.parent:
