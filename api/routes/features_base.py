@@ -122,6 +122,29 @@ class Division(CoreBase):
                                             detail=f"only one root division is allowed, which is {root.name}")
 
 
+class FeatureBase(CoreBase):
+    """Base class for all feature entities, contains the basic CRUD operations inherited from CoreBase"""
+
+    @classmethod
+    def create(cls, request: BaseModel, db: Session, user: UserModel) -> Mapper:
+        request.division = db.query(DivisionModel).filter_by(name=request.division).first()
+        if request.division:
+            return super().create(request, db, creator=user)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
+
+    @classmethod
+    def update(cls, model_id: int, request: BaseModel, db: Session, user: UserModel | None = None) -> dict:
+        model = db.query(cls.db_model).filter_by(id=model_id).first()
+        if model:
+            request.division = db.query(DivisionModel).filter_by(name=request.division).first()
+            if request.division:
+                model.update(**request.model_dump())
+                db.commit()
+                return {"msg": "updates saved"}
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.tag.lower()} not found")
+
+
 class Assignment(FeatureBase):
     validator = AssignmentValidator
     db_model = AssignmentModel
@@ -137,6 +160,20 @@ class Announcement(FeatureBase):
     db_model = AnnouncementModel
 
 
-class Excuse(FeatureBase):
+class SubFeatureBase(CoreBase):
+    """Base class for all sub-feature entities, contains the basic CRUD operations inherited from CoreBase"""
+
+    @classmethod
+    def create(cls, request: BaseModel, db: Session, user: UserModel, feature_to_check: str,
+               feature_model: Mapper) -> Mapper:
+        print(db.query(feature_model).filter_by(id=getattr(request, feature_to_check)).first())
+        setattr(request, feature_to_check,
+                db.query(feature_model).filter_by(id=getattr(request, feature_to_check)).first())
+        if getattr(request, feature_to_check):
+            return super().create(request, db, creator=user)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"{feature_to_check} not found")
+
+
+class Excuse(SubFeatureBase):
     validator = ExcuseValidator
     db_model = ExcuseModel
