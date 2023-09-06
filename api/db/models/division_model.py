@@ -13,11 +13,15 @@ class DivisionModel(Base):
     parent_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"), nullable=True)
 
     # One-to-Many relationships
-    subdivisions: Mapped[List["DivisionModel"]] = Relationship("DivisionModel", back_populates="parent")
+    subdivisions: Mapped[List["DivisionModel"]] = Relationship("DivisionModel", back_populates="parent",
+                                                               cascade="all, delete")
     parent: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="subdivisions", remote_side=[id])
-    announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="division")
-    meetings: Mapped[List["MeetingModel"]] = Relationship("MeetingModel", back_populates="division")
-    assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division")
+    announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="division",
+                                                                    cascade="all, delete")
+    meetings: Mapped[List["MeetingModel"]] = Relationship("MeetingModel", back_populates="division",
+                                                          cascade="all, delete")
+    assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division",
+                                                                cascade="all, delete")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""
