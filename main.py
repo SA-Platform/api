@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from api.routes import divisions, announcements, users, meetings, assignments, excuses
 from fastapi.middleware.cors import CORSMiddleware
-app: FastAPI = FastAPI()
+
+app: FastAPI = FastAPI(
+    title="Student Activity Platform API",
+    version="0.0.1",
+)
 
 origins = [
     "*"
@@ -22,7 +26,7 @@ app.include_router(announcements.announcementsRouter)
 app.include_router(meetings.meetingsRouter)
 app.include_router(excuses.excusesRouter)
 
-
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", reload=True, host='localhost', port=8000)
