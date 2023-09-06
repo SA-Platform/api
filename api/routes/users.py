@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from api.routes.features_base import User
-from api.dependencies import get_db, get_current_user
+from api.dependencies import get_db
 from api.utils import create_token
 from api.validators import UsernameValidator, HTTPErrorValidator
 
@@ -14,7 +14,7 @@ usersRouter: APIRouter = APIRouter(
 
 
 @usersRouter.get(path="/all")
-async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+async def get_users(db: Session = Depends(get_db)):
     return User.get_db_dump(db)
 
 
@@ -22,7 +22,6 @@ async def get_users(db: Session = Depends(get_db), _: User = Depends(get_current
 async def signup(request: User.validator, db: Session = Depends(get_db)):
     if User.get_db_first(db, "email", request.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
-    request.username = request.username.username
     User.validate_username(db, request.username)
     User.create(request, db)
     return {"access_token": create_token({"username": request.username}), "token_type": "bearer"}
@@ -48,3 +47,8 @@ async def validate_username(request: UsernameValidator,
                             db: Session = Depends(get_db)):  ##### need to change the validation error msg
     User.validate_username(db, request.username)
     return {"message": "username is available"}
+
+
+@usersRouter.delete("/delete/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    return User.delete(user_id, db)
