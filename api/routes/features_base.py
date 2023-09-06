@@ -22,7 +22,6 @@ from api.validators import (UserValidator,
 
 class CoreBase(ABC):
     """Base class for all core entities, contains the basic CRUD operations"""
-    name: str
     validator: BaseModel
     db_model: DeclarativeBase
 
