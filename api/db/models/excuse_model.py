@@ -15,11 +15,16 @@ class ExcuseModel(Base):
     description: Mapped[str] = mapped_column(String)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
     validity: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    accepted: Mapped[bool] = mapped_column(Boolean)
+    accepted: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Many-to-one relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="excuses")
     assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="excuses")
+
+    def update(self, description: str, validity: datetime, accepted: bool) -> None:
+        self.description = description
+        self.validity = validity
+        self.accepted = accepted
 
     def __repr__(self):
         return f"""Permission(
