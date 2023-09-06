@@ -16,9 +16,9 @@ async def get_excuses(db: Session = Depends(get_db), _: UserModel = Depends(get_
 
 
 @excusesRouter.post("/excuses")
-async def post_excuse(request: Excuse.validator, db: Session = Depends(get_db),
-                      user: UserModel = Depends(get_current_user)):
-    return Excuse.create(request, db, user)
+async def create_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
+                        user: UserModel = Depends(get_current_user)):
+    return Excuse.create(request, db, user, "assignment", AssignmentModel)
 
 
 @excusesRouter.put("/excuses")
