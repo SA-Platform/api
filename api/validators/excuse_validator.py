@@ -3,12 +3,10 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
 
 
-class ExcuseValidator(BaseModel):
-    id: int | None = None
-    title: str = Field(min_length=2, strip_whitespace=True)
+class ExcuseBaseValidator(BaseModel):
+    """This model is used for patch and put requests as it does not include the assignment field"""
     description: str = Field(min_length=2, strip_whitespace=True)
     validity: datetime
-    accepted: bool
 
     @field_validator("validity")
     def validate_date_future(cls, v: datetime) -> datetime:
@@ -19,9 +17,21 @@ class ExcuseValidator(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "title": "this is an assignment",
+                "description": "this is and edit, dude",
+                "validity": "2027-04-24T22:01:32.904Z",
+            }
+        }
+
+
+class ExcuseValidator(ExcuseBaseValidator):
+    """this model is used for creation as it includes the assignment field"""
+    assignment: int
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "assignment": 1,
                 "description": "this is really an assignment",
                 "validity": "2025-04-24T22:01:32.904Z",
-                "accepted": "True",
             }
         }
