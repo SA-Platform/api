@@ -1,9 +1,10 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from api.db.models import UserModel   # unresolved reference ignored
+from api.db.models import UserModel, AssignmentModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user
 from api.routes.features_base import Excuse
+from api.validators import ExcuseValidator, ExcuseBaseValidator
 
 excusesRouter = APIRouter(
     tags=["Excuses"]
@@ -21,13 +22,13 @@ async def create_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
     return Excuse.create(request, db, user, "assignment", AssignmentModel)
 
 
-@excusesRouter.put("/excuses")
-async def update_excuse(request: Excuse.validator, db: Session = Depends(get_db),
+@excusesRouter.put("/excuses/{excuse_id}")
+async def update_excuse(excuse_id: int, request: ExcuseBaseValidator, db: Session = Depends(get_db),
                         _: UserModel = Depends(get_current_user)):
-    return Excuse.update(request, db)
+    return Excuse.update(excuse_id, request, db)
 
 
-@excusesRouter.delete("/excuses")
+@excusesRouter.delete("/excuses/{excuse_id}")
 async def delete_excuse(excuse_id: int, db: Session = Depends(get_db),
                         _: UserModel = Depends(get_current_user)):
     return Excuse.delete(excuse_id, db)
