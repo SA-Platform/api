@@ -1,5 +1,5 @@
 import datetime
-
+from typing import List
 from sqlalchemy import String, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
@@ -24,8 +24,8 @@ class AssignmentModel(Base):
     division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="assignments")
 
     # One-to-Many relationships
-    submissions: Mapped["SubmissionModel"] = Relationship("SubmissionModel", back_populates="assignment")
-    excuses: Mapped["ExcuseModel"] = Relationship("ExcuseModel", back_populates="assignment")
+    submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="assignment")
+    excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="assignment")
 
     def update(self, title: str, description: str, deadline: datetime,
                weight: int, division: "DivisionModel", attachment: str | None = None) -> None:
@@ -37,7 +37,7 @@ class AssignmentModel(Base):
         self.division = division
 
     def __repr__(self):
-        return f"""Permission(
+        return f"""Assignment(
                 "id": {self.id},
                 "creator_id": {self.creator_id},
                 "division_id": {self.division_id},
