@@ -1,37 +1,39 @@
 from abc import ABC
-from typing import Any
+from typing import Any, TypeVar, List, Callable
 
 from fastapi import HTTPException
 from pydantic import BaseModel
-from sqlalchemy.orm import DeclarativeBase, Session, Mapper
+from sqlalchemy.orm import Session, Query
 from starlette import status
 
 from ...db.models import UserModel
+
+T = TypeVar("T")
 
 
 class CoreBase(ABC):
     """Base class for all crud entities, contains the basic CRUD operations"""
     validator: BaseModel
-    db_model: DeclarativeBase
+    db_model: Callable[..., T]
 
     @classmethod
-    def get_db_first(cls, db: Session, attribute: str, value: Any):
+    def get_db_first(cls, db: Session, attribute: str, value: int | str | None) -> T | None:
         return db.query(cls.db_model).filter_by(**{attribute: value}).first()
 
     @classmethod
-    def get_db_range(cls, db: Session, attribute: str, value: Any, limit: int):
+    def get_db_range(cls, db: Session, attribute: str, value: int | str, limit: int) -> Query[T]:
         return db.query(cls.db_model).filter_by(**{attribute: value}).limit(limit)
 
     @classmethod
-    def get_db_all(cls, db: Session, attribute: str, value: Any):
+    def get_db_all(cls, db: Session, attribute: str, value: int | str) -> List[T]:
         return db.query(cls.db_model).filter_by(**{attribute: value}).all()
 
     @classmethod
-    def get_db_dump(cls, db: Session):
+    def get_db_dump(cls, db: Session) -> List[T]:
         return db.query(cls.db_model).all()
 
     @classmethod
-    def create(cls, db: Session, **kwargs) -> Mapper:
+    def create(cls, db: Session, **kwargs) -> T:
         new_model = cls.db_model(**kwargs)
         db.add(new_model)
         db.commit()
@@ -39,7 +41,7 @@ class CoreBase(ABC):
         return new_model
 
     @classmethod
-    def update(cls, model_id: int, db: Session, **kwargs) -> Mapper:
+    def update(cls, model_id: int, db: Session, **kwargs) -> T:
         model = cls.get_db_first(db, "id", model_id)
         if model:
             cls.db_update(model, **kwargs)
@@ -58,7 +60,7 @@ class CoreBase(ABC):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.__name__.lower()} not found")
 
     @classmethod
-    def db_update(cls, model_instance, **kwargs):
+    def db_update(cls, model_instance, **kwargs) -> None:
         """this method is used to update a model instance without committing to the database"""
         for key, value in kwargs.items():
             setattr(model_instance, key, value)

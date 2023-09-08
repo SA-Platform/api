@@ -8,17 +8,18 @@ from ...db.models import UserModel, DivisionModel
 
 
 class FeatureBase(CoreBase):
-    """Base class for all feature entities, contains the basic CRUD crud inherited from CoreBase"""
+    """Base class for all feature entities, contains the basic CRUD inherited from CoreBase"""
 
     @classmethod
-    def create(cls, request: BaseModel, db: Session, user: UserModel) -> Mapper:
+    def create(cls, request: BaseModel, db: Session, user: UserModel) -> Mapper | None:
         request.division = db.query(DivisionModel).filter_by(name=request.division).first()
         if request.division:
             return super().create(db, creator=user, **request.model_dump())
         raise HTTPException(status.HTTP_404_NOT_FOUND, "division not found")
 
     @classmethod
-    def update(cls, model_id: int, request: BaseModel, db: Session, user: UserModel | None = None, **kwargs) -> dict:
+    def update(cls, model_id: int, request: BaseModel, db: Session, user: UserModel | None = None, **kwargs) -> dict[
+                                                                                                                str: str]:
         model = db.query(cls.db_model).filter_by(id=model_id).first()
         if model:
             request.division = db.query(DivisionModel).filter_by(name=request.division).first()

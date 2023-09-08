@@ -11,6 +11,7 @@ from ...db.models import UserRoleDivisionModel
 
 class UserRoleDivision(CoreBase):
     db_model = UserRoleDivisionModel
+
     @classmethod
     def create(cls, db: Session, user_id: int, role_id: int, division_id: int) -> UserRoleDivisionModel:
         user = User.get_db_first(db, "id", user_id)
