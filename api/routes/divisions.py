@@ -20,7 +20,7 @@ async def get_divisions(db: Session = Depends(get_db),
 @divisionsRouter.post("/divisions", status_code=status.HTTP_201_CREATED)
 async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: UserModel = Depends(get_current_user)):
-    Division.check_division_validity(request, db)
+    Division.check_division_validity(db, request)
     return Division.create(db, name=request.name, parent=db.query(DivisionModel).filter_by(name=request.parent).first())
 
 
@@ -29,7 +29,7 @@ async def update_division(division_id: int, request: DivisionValidator, db: Sess
                           _: UserModel = Depends(get_current_user)):
     division = db.query(DivisionModel).filter_by(id=division_id).first()  # fetch division to be edited
     if division:
-        Division.check_division_validity(request, db, division_id)
+        Division.check_division_validity(db, request, division_id)
         division.name = request.name  # set its name
         division.parent = db.query(DivisionModel).filter_by(name=request.parent).first()  # set its parent
         db.commit()
