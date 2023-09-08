@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedbacks, submissions
+from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedbacks, submissions, roles
 from fastapi.middleware.cors import CORSMiddleware
 
 app: FastAPI = FastAPI(
@@ -21,14 +21,14 @@ app.add_middleware(
 
 app.include_router(users.usersRouter)
 app.include_router(divisions.divisionsRouter)
+app.include_router(roles.rolesRouter)
 app.include_router(assignments.assignmentsRouter)
 app.include_router(announcements.announcementsRouter)
 app.include_router(meetings.meetingsRouter)
-app.include_router(excuses.excusesRouter)
 app.include_router(submissions.submissionsRouter)
+app.include_router(excuses.excusesRouter)
 app.include_router(feedbacks.feedbacksRouter)
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run("main:app", reload=True, host='localhost', port=8000)
