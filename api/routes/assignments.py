@@ -1,9 +1,9 @@
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 
-from api.dependencies import get_current_user, get_db
+from api.crud.feature.assignment import Assignment
 from api.db.models import UserModel  # unresolved reference ignored
-from api.routes.features_base import Assignment
+from api.dependencies import get_current_user, get_db
 
 assignmentsRouter = APIRouter(
     tags=["Assignments"]

@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field, EmailStr, field_validator
+
 from api.validators.username_validator import UsernameValidator
 
 
