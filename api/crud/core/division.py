@@ -18,14 +18,14 @@ class Division(CoreBase):
                                 detail=f"division {division.name} with the same parent {parent.name} already exists")
 
     @classmethod
-    def _check_root_division(cls, division: DivisionModel, division_id: int, db: Session) -> None:
+    def _check_root_division(cls, db: Session, division_id: int) -> None:
         root = cls.get_db_first(db, "parent", None)
         if root and root.id != division_id:
             raise HTTPException(status.HTTP_409_CONFLICT,
                                 detail=f"only one root division is allowed, which is {root.name}")
 
     @classmethod
-    def check_division_validity(cls, request: DivisionValidator, db: Session, division_id: int | None = None) -> None:
+    def check_division_validity(cls, db: Session, request: DivisionValidator, division_id: int | None = None) -> None:
         division = cls.get_db_first(db, "name", request.name)
         parent = cls.get_db_first(db, "name", request.parent) if request.parent else None
 
@@ -46,4 +46,4 @@ class Division(CoreBase):
             if division:
                 raise HTTPException(status.HTTP_409_CONFLICT, detail=f"division {division.name} already exists")
             else:
-                cls._check_root_division(division, division_id, db)
+                cls._check_root_division(db, division_id)
