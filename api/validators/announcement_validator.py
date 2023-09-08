@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field, field_validator
+
 from api.const import AnnouncementsCategory
 
 

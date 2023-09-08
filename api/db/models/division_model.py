@@ -1,4 +1,5 @@
 from typing import List
+
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
@@ -22,6 +23,10 @@ class DivisionModel(Base):
                                                           cascade="all, delete")
     assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division",
                                                                 cascade="all, delete")
+
+    user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
+                                                                             back_populates="division",
+                                                                             cascade="all, delete")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""

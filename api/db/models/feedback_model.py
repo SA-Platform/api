@@ -5,6 +5,7 @@ from sqlalchemy.orm import mapped_column, Mapped, Relationship
 
 from api.db.models.base import Base
 
+
 class FeedbackModel(Base):
     __tablename__ = "feedback"
 

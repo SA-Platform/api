@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import String, DateTime, ForeignKey, Integer, Float
+from sqlalchemy import String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from api.const import AnnouncementsCategory
