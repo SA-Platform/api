@@ -6,7 +6,7 @@ from .core_base import CoreBase
 from .division import Division
 from .role import Role
 from .user import User
-from ...db.models import UserRoleDivisionModel, UserModel
+from ...db.models import UserRoleDivisionModel
 
 
 class UserRoleDivision(CoreBase):
@@ -25,13 +25,13 @@ class UserRoleDivision(CoreBase):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found")
 
     @classmethod
-    def delete(cls, db: Session, user_id: int, role_id: int, division_id: int) -> UserModel:
-        user = db.query(cls.db_model).filter(
+    def delete(cls, db: Session, user_id: int, role_id: int, division_id: int) -> dict:
+        record = db.query(cls.db_model).filter(
             (cls.db_model.user_id == user_id) &
             (cls.db_model.role_id == role_id) &
             (cls.db_model.division_id == division_id)
         ).first()
-        if user:
-            db.delete(user)
+        if record:
+            db.delete(record)
             db.commit()
-            return user
+            return {"message": "record deleted successfully"}
