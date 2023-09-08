@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.db.models import UserModel, AssignmentModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user
 from api.routes.features_base import Submission
-from api.validators import SubmissionValidator, SubmissionBaseValidator
+from api.validators import SubmissionValidator, SubmissionBaseValidator # unresolved reference ignored
 
 submissionsRouter = APIRouter(
     tags=["Submissions"]
