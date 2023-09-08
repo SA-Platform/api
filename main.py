@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedbacks, submissions, roles
 from fastapi.middleware.cors import CORSMiddleware
+
+from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedback, submissions, roles
 
 app: FastAPI = FastAPI(
     title="Student Activity Platform API",
@@ -27,7 +28,7 @@ app.include_router(announcements.announcementsRouter)
 app.include_router(meetings.meetingsRouter)
 app.include_router(submissions.submissionsRouter)
 app.include_router(excuses.excusesRouter)
-app.include_router(feedbacks.feedbacksRouter)
+app.include_router(feedback.feedbacksRouter)
 
 if __name__ == "__main__":
     import uvicorn
