@@ -1,25 +1,24 @@
-from typing import TYPE_CHECKING
-
-from sqlalchemy import String
+from typing import List
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from api.db.models.base import Base
-
-if TYPE_CHECKING:
-    from api.db.models.permission_model import PermissionModel
 
 
 class RoleModel(Base):
     __tablename__ = 'roles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30), unique=True)
+    name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
+    permissions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    # One-to-One relationships
-    permissions: Mapped["PermissionModel"] = Relationship("PermissionModel", back_populates="role")
+    user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
+                                                                             back_populates="role",
+                                                                             cascade="all, delete")
 
     def __repr__(self):
         return f"""Role(
             "id": {self.id}
             "name": {self.name}
+            "permissions": {self.permissions}
         )"""
