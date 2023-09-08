@@ -57,7 +57,7 @@ class CoreBase(ABC):
     def update(cls, model_id: int, request: BaseModel, db: Session, **kwargs) -> Mapper:
         model = cls.get_db_first(db, "id", model_id)
         if model:
-            model.update(**request.model_dump(), **kwargs)
+            cls.db_update(model, **request.model_dump(), **kwargs)
             db.commit()
             db.refresh(model)
             return model
@@ -153,7 +153,7 @@ class FeatureBase(CoreBase):
         if model:
             request.division = db.query(DivisionModel).filter_by(name=request.division).first()
             if request.division:
-                model.update(**request.model_dump())
+                cls.db_update(model, **request.model_dump())
                 db.commit()
                 return {"msg": "updates saved"}
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="division not found")
