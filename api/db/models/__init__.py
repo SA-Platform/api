@@ -9,5 +9,4 @@ for filename in os.listdir(folder):
     if not filename.endswith(".py") or filename.startswith("_") or "base" in filename:
         continue
     module, ext = os.path.splitext(filename)
-    classname = module.split("_")[0].capitalize() + "Model"
-    exec(f"from api.db.models.{module} import {classname}")
+    exec(f"from api.db.models.{module} import *")
