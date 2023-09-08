@@ -10,14 +10,18 @@ from api.db.models import (UserModel,
                            AssignmentModel,
                            MeetingModel,
                            AnnouncementModel,
-                           ExcuseModel)
+                           ExcuseModel,
+                           FeedbackModel,
+                           SubmissionModel)
 
 from api.validators import (UserValidator,
                             AssignmentValidator,
                             DivisionValidator,
                             AnnouncementValidator,
                             MeetingValidator,
-                            ExcuseValidator)
+                            ExcuseValidator,
+                            FeedbackValidator,
+                            SubmissionValidator)
 
 
 class CoreBase(ABC):
@@ -187,3 +191,13 @@ class SubFeatureBase(CoreBase):
 class Excuse(SubFeatureBase):
     validator = ExcuseValidator
     db_model = ExcuseModel
+
+
+class Feedback(SubFeatureBase):
+    validator = FeedbackValidator
+    db_model = FeedbackModel
+
+
+class Submission(SubFeatureBase):
+    validator = SubmissionValidator
+    db_model = SubmissionModel
