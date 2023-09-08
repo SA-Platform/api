@@ -20,8 +20,8 @@ class AnnouncementModel(Base):
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # One-to-Many relationships
-    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="announcements")
-    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="announcements")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="announcements", lazy="joined")
+    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="announcements", lazy="joined")
 
     def update(self, title: str, description: str, category: AnnouncementsCategory, date: datetime,
                division: "DivisionModel") -> None:
@@ -32,10 +32,10 @@ class AnnouncementModel(Base):
         self.division = division
 
     def __repr__(self):
-        return f"""Permission(
+        return f"""Announcement(
                 "id": {self.id},
-                "creator_id": {self.creator_id},
-                "division_id": {self.division_id},
+                "creator": {self.creator},
+                "division": {self.division},
                 "date_created": {self.date_created},
                 "date": {self.date},
                 "category": {self.category},
