@@ -12,7 +12,8 @@ from api.db.models import (UserModel,
                            AnnouncementModel,
                            ExcuseModel,
                            FeedbackModel,
-                           SubmissionModel)
+                           SubmissionModel,
+                           RoleModel)
 
 from api.validators import (UserValidator,
                             AssignmentValidator,
@@ -21,7 +22,8 @@ from api.validators import (UserValidator,
                             MeetingValidator,
                             ExcuseValidator,
                             FeedbackValidator,
-                            SubmissionValidator)
+                            SubmissionValidator,
+                            RoleValidator)
 
 
 class CoreBase(ABC):
@@ -93,6 +95,11 @@ class User(CoreBase):
         existing_user = cls.get_db_first(db, "username", username)
         if existing_user:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="username is taken")
+
+
+class Role(CoreBase):
+    validator = RoleValidator
+    db_model = RoleModel
 
 
 class Division(CoreBase):
