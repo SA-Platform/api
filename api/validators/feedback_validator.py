@@ -12,7 +12,7 @@ class FeedbackBaseValidator(BaseModel):
             "example": {
                 "attachment": r"C:\Users\amr\Desktop\api",
                 "score": 20,
-                "note": "this is really a feedback",
+                "note": "update this is really a feedback",
             }
         }
 
@@ -27,6 +27,6 @@ class FeedbackValidator(FeedbackBaseValidator):
                 "submission": 1,
                 "attachment": r"C:\Users\amr\Desktop\api",
                 "score": 30,
-                "note": "update this is really a feedback",
+                "note": "create this is really a feedback",
             }
         }

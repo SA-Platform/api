@@ -10,7 +10,7 @@ class SubmissionBaseValidator(BaseModel):
         json_schema_extra = {
             "example": {
                 "attachment": r"C:\Users\amr\Desktop\api",
-                "note": "this is really an submission",
+                "note": "update a submission",
             }
         }
 
@@ -24,6 +24,6 @@ class SubmissionValidator(SubmissionBaseValidator):
             "example": {
                 "assignment": 1,
                 "attachment": r"C:\Users\amr\Desktop\api",
-                "note": "update this submission",
+                "note": "create this submission",
             }
         }
