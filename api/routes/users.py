@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from api.routes.features_base import User
+from api.crud.core.user import User
+from api.crud.core.userroledivision import UserRoleDivision
 from api.dependencies import get_db
 from api.utils import create_token
-from api.validators import UsernameValidator, HTTPErrorValidator
+from api.validators import UserValidator, UsernameValidator, HTTPErrorValidator
 
 usersRouter: APIRouter = APIRouter(
     prefix="/users",
@@ -19,11 +20,11 @@ async def get_users(db: Session = Depends(get_db)):
 
 
 @usersRouter.post("/signup", status_code=status.HTTP_201_CREATED)
-async def signup(request: User.validator, db: Session = Depends(get_db)):
+async def signup(request: UserValidator, db: Session = Depends(get_db)):
     if User.get_db_first(db, "email", request.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
     User.validate_username(db, request.username)
-    User.create(request, db)
+    User.create(db, **request.model_dump())
     return {"access_token": create_token({"username": request.username}), "token_type": "bearer"}
 
 
@@ -52,3 +53,13 @@ async def validate_username(request: UsernameValidator,
 @usersRouter.delete("/delete/{user_id}")
 async def delete_user(user_id: int, db: Session = Depends(get_db)):
     return User.delete(user_id, db)
+
+
+@usersRouter.post("/assign_user_role_division")
+async def assign_user_role_division(user_id: int, role_id: int, division_id: int, db: Session = Depends(get_db)):
+    return UserRoleDivision.create(db, user_id, role_id, division_id)
+
+
+@usersRouter.delete("/get_user_role_division")
+async def delete_user_role_division(user_id: int, role_id: int, division_id: int, db: Session = Depends(get_db)):
+    return UserRoleDivision.delete(db, user_id, role_id, division_id)
