@@ -41,7 +41,7 @@ class UserRoleDivision(CoreBase):
 
     @classmethod
     def _add_user_division_permission_record(cls, db: Session, user: UserModel, division: DivisionModel,
-                                             role: RoleModel) -> list:
+                                             role: RoleModel) -> UserDivisionPermissionModel:
         record = db.query(UserDivisionPermissionModel).filter(
             (UserDivisionPermissionModel.user == user) &
             (UserDivisionPermissionModel.division == division)
