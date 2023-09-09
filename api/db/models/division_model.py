@@ -28,5 +28,9 @@ class DivisionModel(Base):
                                                                              back_populates="division",
                                                                              cascade="all, delete")
 
+    user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
+                                                                                         back_populates="division",
+                                                                                         cascade="all, delete")
+
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""

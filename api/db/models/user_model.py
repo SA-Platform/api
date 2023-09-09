@@ -23,7 +23,6 @@ class UserModel(Base):
     email: Mapped[str] = mapped_column(String, unique=True)
     username: Mapped[str] = mapped_column(String, unique=True)
     password: Mapped[str] = mapped_column(String)
-    permission: Mapped[int] = mapped_column(Integer, default=0)
     faculty: Mapped[str] = mapped_column(String)
     university: Mapped[str] = mapped_column(String)
     faculty_department: Mapped[str] = mapped_column(String)
@@ -49,6 +48,9 @@ class UserModel(Base):
     user_role_division: Mapped[List["UserRoleDivisonModel"]] = Relationship("UserRoleDivisionModel",
                                                                             back_populates="user",
                                                                             cascade="all, delete-orphan")
+    user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
+                                                                                         back_populates="user",
+                                                                                            cascade="all, delete-orphan")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")

@@ -7,6 +7,7 @@ from .division import Division
 from .role import Role
 from .user import User
 from ...db.models import UserRoleDivisionModel
+from ...db.models import UserModel, DivisionModel, UserDivisionPermissionModel, RoleModel
 
 
 class UserRoleDivision(CoreBase):
@@ -20,6 +21,7 @@ class UserRoleDivision(CoreBase):
             if role:
                 division = Division.get_db_first(db, "id", division_id)
                 if division:
+                    cls._add_user_division_permission_record(db, user, division, role)
                     return super().create(db, user=user, role=role, division=division)
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="role not found")
@@ -36,3 +38,17 @@ class UserRoleDivision(CoreBase):
             db.delete(record)
             db.commit()
             return {"message": "record deleted successfully"}
+
+    @classmethod
+    def _add_user_division_permission_record(cls, db: Session, user: UserModel, division: DivisionModel,
+                                             role: RoleModel) -> list:
+        record = db.query(UserDivisionPermissionModel).filter(
+            (UserDivisionPermissionModel.user == user) &
+            (UserDivisionPermissionModel.division == division)
+        ).first()
+        if record:
+            record.permissions |= role.permissions
+        else:
+            record = UserDivisionPermissionModel(user=user, division=division, permissions=role.permissions)
+            db.add(record)
+        return record
