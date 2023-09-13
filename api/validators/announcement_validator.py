@@ -25,6 +25,6 @@ class AnnouncementValidator(BaseModel):
                 "description": "this is really an announcement",
                 "date": "2025-04-24T22:01:32.904Z",
                 "category": "internship",
-                "division": "ras",
+                "division": "RAS",
             }
         }
