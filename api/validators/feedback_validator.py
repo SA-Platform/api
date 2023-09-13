@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 class FeedbackBaseValidator(BaseModel):
     """This model is used for patch and put requests as it does not include the assignment field"""
     attachment: str = Field(min_length=2, strip_whitespace=True)
-    score: int = Field(gt=0)
+    score: int = Field(gt=-1)
     note: str = Field(min_length=2, strip_whitespace=True)
 
     class Config:
