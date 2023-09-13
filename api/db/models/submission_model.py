@@ -19,7 +19,8 @@ class SubmissionModel(Base):
     # Many-to-One relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="submissions")
     assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="submissions")
-    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission")
+    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission",
+                                                     cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"""Permission(
