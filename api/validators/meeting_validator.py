@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
 
 
-class MeetingValidator(BaseModel):
+class MeetingBaseValidator(BaseModel):
     title: str = Field(min_length=2, strip_whitespace=True)
     description: str = Field(min_length=2)
     date: datetime
@@ -26,11 +26,28 @@ class MeetingValidator(BaseModel):
                 raise ValueError("Float value must have at least 6 decimal places.")
         return value
 
+
+class MeetingValidator(MeetingBaseValidator):
     class Config:
         json_schema_extra = {
             "example": {
                 "title": "this is an meeting",
                 "description": "this is really an meeting",
+                "date": "2025-04-24T22:01:32.904Z",
+                "location_text": "our lovely college",
+                "location_long": "30.586388",
+                "location_lat": "31.482434",
+                "division": "CS",
+            }
+        }
+
+
+class MeetingUpdateValidator(MeetingBaseValidator):
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "update meeting",
+                "description": "update meeting",
                 "date": "2025-04-24T22:01:32.904Z",
                 "location_text": "our lovely college",
                 "location_long": "30.586388",
