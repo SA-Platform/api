@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.crud.core.division import Division
 from api.db.models import UserModel, DivisionModel  # unresolved reference ignored
 from api.dependencies import get_current_user, get_db
-from api.validators import DivisionValidator
+from api.validators import DivisionValidator, DivisionUpdateValidator
 
 divisionsRouter = APIRouter(
     tags=["Divisions"]
@@ -27,7 +27,7 @@ async def create_division(request: DivisionValidator, db: Session = Depends(get_
 
 
 @divisionsRouter.put("/divisions/{division_id}")
-async def update_division(division_id: int, request: DivisionValidator, db: Session = Depends(get_db),
+async def update_division(division_id: int, request: DivisionUpdateValidator, db: Session = Depends(get_db),
                           _: UserModel = Depends(get_current_user)):
     division = db.query(DivisionModel).filter_by(id=division_id).first()  # fetch division to be edited
     if division:
