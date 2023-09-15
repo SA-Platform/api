@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 from api.const import AnnouncementsCategory
 
 
-class AnnouncementValidator(BaseModel):
+class AnnouncementBaseValidator(BaseModel):
     title: str = Field(min_length=2, strip_whitespace=True)
     description: str = Field(min_length=2, strip_whitespace=True)
     date: datetime | None
@@ -18,6 +18,8 @@ class AnnouncementValidator(BaseModel):
             raise ValueError("date must be in the future")
         return v
 
+
+class AnnouncementValidator(AnnouncementBaseValidator):
     class Config:
         json_schema_extra = {
             "example": {
@@ -25,6 +27,19 @@ class AnnouncementValidator(BaseModel):
                 "description": "this is really an announcement",
                 "date": "2025-04-24T22:01:32.904Z",
                 "category": "internship",
+                "division": "RAS",
+            }
+        }
+
+
+class AnnouncementUpdateValidator(AnnouncementBaseValidator):
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "update the  announcement",
+                "description": "update the announcement",
+                "date": "2025-04-24T22:01:32.904Z",
+                "category": "event",
                 "division": "RAS",
             }
         }
