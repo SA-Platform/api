@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.crud.sub_feature.submission import Submission
 from api.db.models import UserModel, AssignmentModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user
-from api.validators import SubmissionValidator, SubmissionBaseValidator  # unresolved reference ignored
+from api.validators import SubmissionValidator, SubmissionUpdateValidator  # unresolved reference ignored
 
 submissionsRouter = APIRouter(
     tags=["Submissions"]
@@ -23,7 +23,7 @@ async def create_submission(request: SubmissionValidator, db: Session = Depends(
 
 
 @submissionsRouter.put("/submissions/{submission_id}")
-async def update_submission(submission_id: int, request: SubmissionBaseValidator, db: Session = Depends(get_db),
+async def update_submission(submission_id: int, request: SubmissionUpdateValidator, db: Session = Depends(get_db),
                             _: UserModel = Depends(get_current_user)):
     return Submission.update(submission_id, db, **request.model_dump())
 
