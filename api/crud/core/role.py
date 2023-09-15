@@ -5,11 +5,9 @@ from starlette import status
 from .core_base import CoreBase
 from ...const import Permissions
 from ...db.models import RoleModel
-from ...validators import RoleValidator
 
 
 class Role(CoreBase):
-    validator = RoleValidator
     db_model = RoleModel
 
     @classmethod

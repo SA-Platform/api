@@ -4,11 +4,9 @@ from starlette import status
 
 from .core_base import CoreBase
 from ...db.models import UserModel
-from ...validators import UserValidator
 
 
 class User(CoreBase):
-    validator = UserValidator
     db_model = UserModel
 
     @classmethod

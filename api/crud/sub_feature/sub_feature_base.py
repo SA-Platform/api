@@ -18,6 +18,3 @@ class SubFeatureBase(CoreBase):
         if getattr(request, feature_to_check):
             return super().create(db, creator=user, **request.model_dump())
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"{feature_to_check} not found")
-
-
-

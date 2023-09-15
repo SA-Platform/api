@@ -8,7 +8,6 @@ from ...validators import DivisionValidator
 
 
 class Division(CoreBase):
-    validator = DivisionValidator
     db_model = DivisionModel
 
     @classmethod
