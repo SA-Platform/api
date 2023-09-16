@@ -9,7 +9,7 @@ class UserValidator(BaseModel):
     first_name: str = Field(min_length=2, strip_whitespace=True, to_lower=True, strict=True, capitalize=True)
     last_name: str = Field(min_length=2, strip_whitespace=True, to_lower=True, strict=True, capitalize=True)
     birthdate: datetime
-    phone_number: str = Field(min_length=11, max_length=11, pattern=r"^(01)[0-9]{9}$", strip_whitespace=True)
+    phone_number: str = Field(min_length=7, max_length=15, pattern=r"^(01)[0-9]{9}$", strip_whitespace=True)
     email: EmailStr
     username: str
     password: str = Field(min_length=8)

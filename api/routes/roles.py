@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 
 from api.const import Permissions
 from api.crud.core.role import Role
-from api.db.models.user_model import UserModel
+from api.db.models import UserModel
 from api.dependencies import get_db, get_current_user, CheckPermission
-from api.validators import RoleValidator
+from api.validators import RoleValidator, RoleUpdateValidator
 
 rolesRouter: APIRouter = APIRouter(
     tags=["Roles"]
@@ -27,7 +27,7 @@ async def create_role(request: RoleValidator,
 
 
 @rolesRouter.put(path="/roles/{role_id}")
-async def update_role(role_id: int, request: RoleValidator, db: Session = Depends(get_db),
+async def update_role(role_id: int, request: RoleUpdateValidator, db: Session = Depends(get_db),
                       _: UserModel = Depends(CheckPermission(Permissions.UPDATE_ROLE, core=True))):
     return Role.update(role_id, db, **request.model_dump())
 

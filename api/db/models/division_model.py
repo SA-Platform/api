@@ -15,14 +15,14 @@ class DivisionModel(Base):
 
     # One-to-Many relationships
     subdivisions: Mapped[List["DivisionModel"]] = Relationship("DivisionModel", back_populates="parent",
-                                                               cascade="all, delete")
+                                                               cascade="all, delete-orphan")
     parent: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="subdivisions", remote_side=[id])
     announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="division",
-                                                                    cascade="all, delete")
+                                                                    cascade="all, delete-orphan")
     meetings: Mapped[List["MeetingModel"]] = Relationship("MeetingModel", back_populates="division",
-                                                          cascade="all, delete")
+                                                          cascade="all, delete-orphan")
     assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division",
-                                                                cascade="all, delete")
+                                                                cascade="all, delete-orphan")
     submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="division",
                                                                 cascade="all, delete")
     excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="division", cascade="all, delete")
@@ -31,11 +31,11 @@ class DivisionModel(Base):
 
     user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
                                                                              back_populates="division",
-                                                                             cascade="all, delete")
+                                                                             cascade="all, delete-orphan")
 
     user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
                                                                                          back_populates="division",
-                                                                                         cascade="all, delete")
+                                                                                         cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""

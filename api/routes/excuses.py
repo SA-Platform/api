@@ -5,7 +5,7 @@ from api.const import Permissions
 from api.crud.sub_feature.excuse import Excuse
 from api.db.models import UserModel, AssignmentModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user, CheckPermission
-from api.validators import ExcuseValidator, ExcuseBaseValidator
+from api.validators import ExcuseValidator, ExcuseUpdateValidator
 
 excusesRouter = APIRouter(
     tags=["Excuses"]
@@ -24,9 +24,9 @@ async def create_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
 
 
 @excusesRouter.put("/excuses/{excuse_id}")
-async def update_excuse(excuse_id: int, request: ExcuseBaseValidator, db: Session = Depends(get_db),
+async def update_excuse(excuse_id: int, request: ExcuseUpdateValidator, db: Session = Depends(get_db),
                         _: UserModel = Depends(CheckPermission(Permissions.UPDATE_EXCUSE))):
-    return Excuse.update(excuse_id, db, **request.model_dump())
+    return Excuse.update(excuse_id, db,  **request.model_dump())
 
 
 @excusesRouter.delete("/excuses/{model_id}")

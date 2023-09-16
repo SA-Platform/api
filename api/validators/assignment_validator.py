@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
 
 
-class AssignmentValidator(BaseModel):
+class AssignmentBaseValidator(BaseModel):
     title: str = Field(min_length=2, strip_whitespace=True)
     description: str = Field(min_length=2, strip_whitespace=True)
     deadline: datetime
@@ -16,6 +16,8 @@ class AssignmentValidator(BaseModel):
             raise ValueError("date must be in the future")
         return v
 
+
+class AssignmentValidator(AssignmentBaseValidator):
     class Config:
         json_schema_extra = {
             "example": {
@@ -23,6 +25,19 @@ class AssignmentValidator(BaseModel):
                 "description": "this is really an assignment",
                 "deadline": "2025-04-24T22:01:32.904Z",
                 "weight": "20",
+                "division": "CS",
+            }
+        }
+
+
+class AssignmentUpdateValidator(AssignmentBaseValidator):
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "update assignment",
+                "description": "update assignment",
+                "deadline": "2025-04-24T22:01:32.904Z",
+                "weight": "30",
                 "division": "CS",
             }
         }

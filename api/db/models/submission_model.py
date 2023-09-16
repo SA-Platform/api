@@ -20,8 +20,9 @@ class SubmissionModel(Base):
     # Many-to-One relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="submissions")
     assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="submissions")
+    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission",
+                                                     cascade="all, delete-orphan")
     division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="submissions")
-    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission")
 
     def __repr__(self):
         return f"""Permission(
@@ -31,3 +32,4 @@ class SubmissionModel(Base):
                 "note": {self.note},
                 "attachment": {self.attachment},
             )"""
+

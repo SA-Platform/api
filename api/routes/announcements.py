@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from api.const import Permissions
 from api.crud.feature.announcement import Announcement
 from api.db.models import UserModel  # unresolved reference ignored
+from api.validators import AnnouncementValidator, AnnouncementUpdateValidator
 from api.dependencies import get_db, get_current_user, CheckPermission
 
 announcementsRouter = APIRouter(
@@ -17,13 +18,14 @@ async def get_announcements(db: Session = Depends(get_db)):
 
 
 @announcementsRouter.post("/announcements")
-async def post_announcement(request: Announcement.validator, db: Session = Depends(get_db),
+async def post_announcement(request: AnnouncementValidator, db: Session = Depends(get_db),
                             user: UserModel = Depends(CheckPermission(Permissions.CREATE_ANNOUNCEMENT))):
     return Announcement.create(request, db, user)
 
 
 @announcementsRouter.put("/announcements/{announcement_id}")
-async def update_announcement(announcement_id: int, request: Announcement.validator, db: Session = Depends(get_db),
+async def update_announcement(announcement_id: int, request: AnnouncementUpdateValidator,
+                              db: Session = Depends(get_db),
                               _: UserModel = Depends(CheckPermission(Permissions.UPDATE_ANNOUNCEMENT))):
     return Announcement.update(announcement_id, request, db)
 

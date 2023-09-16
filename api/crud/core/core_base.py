@@ -1,8 +1,7 @@
 from abc import ABC
-from typing import Any, TypeVar, List, Callable
+from typing import TypeVar, List, Callable
 
 from fastapi import HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session, Query
 from starlette import status
 
@@ -13,7 +12,6 @@ T = TypeVar("T")
 
 class CoreBase(ABC):
     """Base class for all crud entities, contains the basic CRUD operations"""
-    validator: BaseModel
     db_model: T
 
     @classmethod

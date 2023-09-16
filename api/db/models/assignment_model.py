@@ -25,8 +25,10 @@ class AssignmentModel(Base):
     division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="assignments")
 
     # One-to-Many relationships
-    submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="assignment")
-    excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="assignment")
+    submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="assignment",
+                                                                cascade="all, delete-orphan")
+    excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="assignment",
+                                                        cascade="all, delete-orphan")
 
     def update(self, title: str, description: str, deadline: datetime,
                weight: int, division: "DivisionModel", attachment: str | None = None) -> None:

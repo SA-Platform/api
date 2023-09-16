@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class ExcuseBaseValidator(BaseModel):
-    """This model is used for patch and put requests as it does not include the assignment field"""
+    """This model is only used for inheritance"""
     description: str = Field(min_length=2, strip_whitespace=True)
     validity: datetime
 
@@ -13,14 +13,6 @@ class ExcuseBaseValidator(BaseModel):
         if v < datetime.now(timezone.utc):
             raise ValueError("date must be in the future")
         return v
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "description": "this is and edit, dude",
-                "validity": "2027-04-24T22:01:32.904Z",
-            }
-        }
 
 
 class ExcuseValidator(ExcuseBaseValidator):
@@ -33,5 +25,17 @@ class ExcuseValidator(ExcuseBaseValidator):
                 "assignment": 1,
                 "description": "this is really an assignment",
                 "validity": "2025-04-24T22:01:32.904Z",
+            }
+        }
+
+
+class ExcuseUpdateValidator(ExcuseBaseValidator):
+    """This model is used for patch and put requests as it does not include the assignment field"""
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "description": "this is and edit, dude",
+                "validity": "2027-04-24T22:01:32.904Z",
             }
         }
