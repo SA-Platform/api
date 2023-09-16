@@ -14,7 +14,7 @@ T = TypeVar("T")
 class CoreBase(ABC):
     """Base class for all crud entities, contains the basic CRUD operations"""
     validator: BaseModel
-    db_model: Callable[..., T]
+    db_model: T
 
     @classmethod
     def get_db_first(cls, db: Session, attribute: str, value: int | str | None) -> T | None:
