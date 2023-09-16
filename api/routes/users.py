@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from api.const import Permissions
 from api.crud.core.user import User
 from api.crud.core.userroledivision import UserRoleDivision
-from api.dependencies import get_db
+from api.db.models.user_model import UserModel
+from api.dependencies import get_db, CheckPermission
 from api.utils import create_token
 from api.validators import UserValidator, UsernameValidator, HTTPErrorValidator
 
@@ -51,8 +53,14 @@ async def validate_username(request: UsernameValidator,
 
 
 @usersRouter.delete("/delete/{user_id}")
-async def delete_user(user_id: int, db: Session = Depends(get_db)):
+async def delete_user(user_id: int, db: Session = Depends(get_db),
+                      _: UserModel = Depends(CheckPermission(Permissions.DELETE_USER, core=True))):
     return User.delete(user_id, db)
+
+
+@usersRouter.get("/assign_user_role_division")
+async def assign_user_role_division(db: Session = Depends(get_db)):
+    return UserRoleDivision.get_db_dump(db)
 
 
 @usersRouter.post("/assign_user_role_division")
@@ -60,6 +68,6 @@ async def assign_user_role_division(user_id: int, role_id: int, division_id: int
     return UserRoleDivision.create(db, user_id, role_id, division_id)
 
 
-@usersRouter.delete("/get_user_role_division")
+@usersRouter.delete("/get_user_role_division/{user_id}/{role_id}/{division_id}")
 async def delete_user_role_division(user_id: int, role_id: int, division_id: int, db: Session = Depends(get_db)):
     return UserRoleDivision.delete(db, user_id, role_id, division_id)

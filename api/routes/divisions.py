@@ -1,10 +1,11 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 
 from api.crud.core.division import Division
 from api.db.models import UserModel, DivisionModel  # unresolved reference ignored
-from api.dependencies import get_current_user, get_db
+from api.dependencies import get_current_user, get_db, CheckPermission
 from api.validators import DivisionValidator
+from api.const import Permissions
 
 divisionsRouter = APIRouter(
     tags=["Divisions"]
@@ -12,21 +13,21 @@ divisionsRouter = APIRouter(
 
 
 @divisionsRouter.get("/divisions")
-async def get_divisions(db: Session = Depends(get_db),
-                        _: UserModel = Depends(get_current_user)):
+async def get_divisions(db: Session = Depends(get_db)):
     return Division.get_db_dump(db)
 
 
 @divisionsRouter.post("/divisions", status_code=status.HTTP_201_CREATED)
-async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
-                          _: UserModel = Depends(get_current_user)):
+async def create_division(request: DivisionValidator,
+                          db: Session = Depends(get_db),
+                          _: UserModel = Depends(CheckPermission(Permissions.CREATE_DIVISION, core=True))):
     Division.check_division_validity(db, request)
     return Division.create(db, name=request.name, parent=db.query(DivisionModel).filter_by(name=request.parent).first())
 
 
 @divisionsRouter.put("/divisions/{division_id}")
 async def update_division(division_id: int, request: DivisionValidator, db: Session = Depends(get_db),
-                          _: UserModel = Depends(get_current_user)):
+                          _: UserModel = Depends(CheckPermission(Permissions.UPDATE_DIVISION, core=True))):
     division = db.query(DivisionModel).filter_by(id=division_id).first()  # fetch division to be edited
     if division:
         Division.check_division_validity(db, request, division_id)
@@ -39,5 +40,7 @@ async def update_division(division_id: int, request: DivisionValidator, db: Sess
 
 
 @divisionsRouter.delete("/divisions/{division_id}")
-async def delete_division(division_id: int, db: Session = Depends(get_db), _: UserModel = Depends(get_current_user)):
+async def delete_division(division_id: int,
+                          db: Session = Depends(get_db),
+                          _: UserModel = Depends(CheckPermission(Permissions.DELETE_DIVISION, core=True))):
     return Division.delete(division_id, db)
