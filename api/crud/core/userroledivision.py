@@ -36,8 +36,11 @@ class UserRoleDivision(CoreBase):
         ).first()
         if record:
             db.delete(record)
+            db.delete(cls._delete_user_division_permission_record(db, record.user, record.division, record.role))
             db.commit()
+
             return {"message": "record deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="record not found")
 
     @classmethod
     def _add_user_division_permission_record(cls, db: Session, user: UserModel, division: DivisionModel,
@@ -51,4 +54,17 @@ class UserRoleDivision(CoreBase):
         else:
             record = UserDivisionPermissionModel(user=user, division=division, permissions=role.permissions)
             db.add(record)
+        return record
+
+    @classmethod
+    def _delete_user_division_permission_record(cls, db: Session, user: UserModel, division: DivisionModel,
+                                                role: RoleModel) -> UserDivisionPermissionModel:
+        record = db.query(UserDivisionPermissionModel).filter(
+            (UserDivisionPermissionModel.user == user) &
+            (UserDivisionPermissionModel.division == division)
+        ).first()
+        if record:
+            record.permissions &= ~role.permissions
+            if record.permissions == 0:
+                db.delete(record)
         return record
