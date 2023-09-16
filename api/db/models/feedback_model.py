@@ -16,10 +16,12 @@ class FeedbackModel(Base):
     score: Mapped[int] = mapped_column(Integer)  #############
     note: Mapped[str] = mapped_column(String)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="feedback")
     submission: Mapped["SubmissionModel"] = Relationship("SubmissionModel", back_populates="feedback")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="feedback")
 
     def __repr__(self):
         return f"""Permission(

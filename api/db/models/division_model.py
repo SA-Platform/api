@@ -23,6 +23,11 @@ class DivisionModel(Base):
                                                           cascade="all, delete")
     assignments: Mapped[List["AssignmentModel"]] = Relationship("AssignmentModel", back_populates="division",
                                                                 cascade="all, delete")
+    submissions: Mapped[List["SubmissionModel"]] = Relationship("SubmissionModel", back_populates="division",
+                                                                cascade="all, delete")
+    excuses: Mapped[List["ExcuseModel"]] = Relationship("ExcuseModel", back_populates="division", cascade="all, delete")
+    feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="division",
+                                                           cascade="all, delete")
 
     user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
                                                                              back_populates="division",

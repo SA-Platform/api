@@ -15,10 +15,12 @@ class SubmissionModel(Base):
     attachment: Mapped[str] = mapped_column(String, nullable=True)
     note: Mapped[str] = mapped_column(String)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="submissions")
     assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="submissions")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="submissions")
     feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission")
 
     def __repr__(self):

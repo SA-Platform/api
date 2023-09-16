@@ -16,9 +16,11 @@ class ExcuseModel(Base):
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
     validity: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     accepted: Mapped[bool] = mapped_column(Boolean, default=False)
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-one relationships
     creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="excuses")
+    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="excuses")
     assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="excuses")
 
     def update(self, description: str, validity: datetime, accepted: bool) -> None:
