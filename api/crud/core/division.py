@@ -4,7 +4,7 @@ from starlette import status
 
 from .core_base import CoreBase
 from ...db.models import DivisionModel
-from ...validators import DivisionValidator
+from ...validators import DivisionBaseValidator
 
 
 class Division(CoreBase):
@@ -24,10 +24,10 @@ class Division(CoreBase):
                                 detail=f"only one root division is allowed, which is {root.name}")
 
     @classmethod
-    def check_division_validity(cls, db: Session, request: DivisionValidator, division_id: int | None = None) -> None:
+    def check_division_validity(cls, db: Session, request: DivisionBaseValidator, division_id: int | None = None) -> None:
         division = cls.get_db_first(db, "name", request.name)
         parent = cls.get_db_first(db, "name", request.parent) if request.parent else None
-
+        
         if request.name == request.parent:
             raise HTTPException(status.HTTP_409_CONFLICT, detail="division can't be its own parent")
 
@@ -41,6 +41,10 @@ class Division(CoreBase):
                 if not division.parent:
                     raise HTTPException(status.HTTP_409_CONFLICT,
                                         detail=f"division {division.name} is a root division and can't have a parent")
+
+            # if getattr(request, "id") and request.id == parent.id:
+            #     raise HTTPException(status.HTTP_409_CONFLICT, detail="division can't be its own parent")
+
         else:
             if division:
                 raise HTTPException(status.HTTP_409_CONFLICT, detail=f"division {division.name} already exists")
