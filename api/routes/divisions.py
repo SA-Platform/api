@@ -20,6 +20,8 @@ async def get_divisions(db: Session = Depends(get_db)):
 @divisionsRouter.post("/divisions", status_code=status.HTTP_201_CREATED)
 async def create_division(request: DivisionValidator, db: Session = Depends(get_db),
                           _: UserModel = Depends(CheckPermission(Permissions.CREATE_DIVISION, core=True))):
+    request.name = request.name.strip().lower()
+    request.parent = request.parent.strip().lower() if request.parent else None
     Division.check_division_validity(db, request)
     return Division.create(db, name=request.name, parent=db.query(DivisionModel).filter_by(name=request.parent).first())
 
