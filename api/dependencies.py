@@ -36,11 +36,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 class CheckPermission:
-    def __init__(self, permission_to_check: int, core: bool = False, delete: bool = False, model: Mapper = None):
+    def __init__(self, permission_to_check: int, core: bool = False):
         self.permission_to_check: int = permission_to_check
         self.core: bool = core
-        self.delete: bool = delete
-        self.model: Mapper = model
 
     async def __call__(self, request: Request,
                        user: UserModel = Depends(get_current_user),
@@ -52,17 +50,7 @@ class CheckPermission:
                 return user
 
             division: DivisionModel | None = db.query(DivisionModel).filter_by(parent=None).first()
-
-        else:
-            if self.delete:
-                print(await request.json())
-                division: DivisionModel | None = db.query(self.model).filter_by(
-                    id=await self._read_value_from_request(request, "model_id")).first().division
-            else:
-                division: DivisionModel | None = db.query(DivisionModel).filter_by(
-                    name=await self._read_value_from_request(request, "division")).first()
-
-        return self._compare_permissions(user, self.permission_to_check, division, db)
+            return self._compare_permissions(user, self.permission_to_check, division, db)
 
     @classmethod
     async def _read_value_from_request(cls, request: Request, key: str) -> Any:
