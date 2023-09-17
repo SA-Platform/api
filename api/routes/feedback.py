@@ -19,18 +19,17 @@ async def get_feedback(db: Session = Depends(get_db)):
 
 @feedbacksRouter.post("/feedback")
 async def create_feedback(request: FeedbackValidator, db: Session = Depends(get_db),
-                          user: UserModel = Depends(CheckPermission(Permissions.CREATE_FEEDBACK))):
-    return Feedback.create(request, db, user, "submission", SubmissionModel)
+                          user: UserModel = Depends(get_current_user)):
+    return Feedback.create(request, db, user)
 
 
 @feedbacksRouter.put("/feedback/{feedback_id}")
 async def update_feedback(feedback_id: int, request: FeedbackUpdateValidator, db: Session = Depends(get_db),
-                          _: UserModel = Depends(CheckPermission(Permissions.UPDATE_FEEDBACK))):
-    return Feedback.update(feedback_id, db,  **request.model_dump())
+                          user: UserModel = Depends(get_current_user)):
+    return Feedback.update(feedback_id, db, user,  **request.model_dump())
 
 
 @feedbacksRouter.delete("/feedback/{model_id}")
 async def delete_feedback(model_id: int, db: Session = Depends(get_db),
-                          _: UserModel = Depends(CheckPermission(Permissions.DELETE_FEEDBACK, delete=True,
-                                                                 model=Feedback.db_model))):
-    return Feedback.delete(model_id, db)
+                          user: UserModel = Depends(get_current_user)):
+    return Feedback.delete(model_id, db, user)

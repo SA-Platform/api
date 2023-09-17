@@ -19,18 +19,17 @@ async def get_excuses(db: Session = Depends(get_db)):
 
 @excusesRouter.post("/excuses")
 async def create_excuse(request: ExcuseValidator, db: Session = Depends(get_db),
-                        user: UserModel = Depends(CheckPermission(Permissions.CREATE_EXCUSE))):
-    return Excuse.create(request, db, user, "assignment", AssignmentModel)
+                        user: UserModel = Depends(get_current_user)):
+    return Excuse.create(request, db, user)
 
 
 @excusesRouter.put("/excuses/{excuse_id}")
 async def update_excuse(excuse_id: int, request: ExcuseUpdateValidator, db: Session = Depends(get_db),
-                        _: UserModel = Depends(CheckPermission(Permissions.UPDATE_EXCUSE))):
-    return Excuse.update(excuse_id, db,  **request.model_dump())
+                        user: UserModel = Depends(get_current_user)):
+    return Excuse.update(excuse_id, db, user,  **request.model_dump())
 
 
 @excusesRouter.delete("/excuses/{model_id}")
 async def delete_excuse(model_id: int, db: Session = Depends(get_db),
-                        _: UserModel = Depends(CheckPermission(Permissions.DELETE_EXCUSE, delete=True,
-                                                               model=Excuse.db_model))):
-    return Excuse.delete(model_id, db)
+                        user: UserModel = Depends(get_current_user)):
+    return Excuse.delete(model_id, db, user)

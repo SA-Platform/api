@@ -19,19 +19,18 @@ async def get_meetings(db: Session = Depends(get_db), _: UserModel = Depends(get
 
 @meetingsRouter.post("/meetings")
 async def post_meeting(request: MeetingValidator, db: Session = Depends(get_db),
-                       user: UserModel = Depends(CheckPermission(Permissions.CREATE_MEETING))):
+                       user: UserModel = Depends(get_current_user)):
     return Meeting.create(request, db, user)
 
 
 @meetingsRouter.put("/meetings/{meeting_id}")
 async def update_meeting(meeting_id: int, request: MeetingUpdateValidator, db: Session = Depends(get_db),
-                         _: UserModel = Depends(CheckPermission(Permissions.UPDATE_MEETING))):
-    return Meeting.update(meeting_id, request, db)
+                         user: UserModel = Depends(get_current_user)):
+    return Meeting.update(meeting_id, request, db, user)
 
 
 @meetingsRouter.delete("/meetings/{model_id}")
 async def delete_meeting(model_id: int,
                          db: Session = Depends(get_db),
-                         _: UserModel = Depends(CheckPermission(Permissions.DELETE_MEETING, delete=True,
-                                                                model=Meeting.db_model))):
-    return Meeting.delete(model_id, db)
+                         user: UserModel = Depends(get_current_user)):
+    return Meeting.delete(model_id, db, user)
