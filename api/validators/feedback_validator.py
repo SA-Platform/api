@@ -15,6 +15,7 @@ class FeedbackValidator(FeedbackBaseValidator):
     class Config:
         json_schema_extra = {
             "example": {
+                "submission": 1,
                 "attachment": r"C:\Users\amr\Desktop\api",
                 "score": 30,
                 "note": "create this is really a feedback",
@@ -28,7 +29,6 @@ class FeedbackUpdateValidator(FeedbackBaseValidator):
     class Config:
         json_schema_extra = {
             "example": {
-                "submission": 1,
                 "attachment": r"C:\Users\amr\Desktop\api",
                 "score": 40,
                 "note": "Update feedback",
