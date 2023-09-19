@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, Query
 from starlette import status
 
+from ...const import CorePermissions, FeaturePermissions
 from ...db.models import UserModel
 
 T = TypeVar("T")
@@ -62,3 +63,20 @@ class CoreBase(ABC):
         """this method is used to update a model instance without committing to the database"""
         for key, value in kwargs.items():
             setattr(model_instance, key, value)
+
+    @classmethod
+    def _calculate_core_permission(cls, request_permissions: dict) -> int:
+        total_request: int = 0
+        for permission in CorePermissions:
+            if request_permissions[permission.name]:
+                total_request = total_request | permission.value
+        return total_request
+
+    @classmethod
+    def _calculate_feature_permission(cls, request_permissions: dict) -> int:
+        total_request: int = 0
+        for permission in FeaturePermissions:
+            if request_permissions[permission.name]:
+                total_request = total_request | permission.value
+        return total_request
+

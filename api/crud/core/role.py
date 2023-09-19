@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from .core_base import CoreBase
-from ...const import Permissions
 from ...db.models import RoleModel
+from ...db.models.division_model import DivisionModel
 
 
 class Role(CoreBase):
@@ -13,8 +13,10 @@ class Role(CoreBase):
     @classmethod
     def create(cls, db: Session, **kwargs) -> RoleModel:
         cls.check_role_exists(db, kwargs.get("name"))
+        cls.check_division_exists(db, kwargs.get("division_id"))
         return super().create(db, name=kwargs["name"],
-                              permissions=cls._calculate_total_permission(kwargs["permissions"]))
+                              division_id=kwargs["division_id"],
+                              permissions=cls._calculate_feature_permission(kwargs["permissions"]))
 
     @classmethod
     def update(cls, model_id: int, db: Session, **kwargs) -> RoleModel:
@@ -36,10 +38,16 @@ class Role(CoreBase):
         if role:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role already exists")
 
+    # @classmethod
+    # def _calculate_total_permission(cls, request_permissions: dict) -> int:
+    #     total_request: int = 0
+    #     for permission in Permissions:
+    #         if request_permissions[permission.name]:
+    #             total_request = total_request | permission.value
+    #     return total_request
+
     @classmethod
-    def _calculate_total_permission(cls, request_permissions: dict) -> int:
-        total_request: int = 0
-        for permission in Permissions:
-            if request_permissions[permission.name]:
-                total_request = total_request | permission.value
-        return total_request
+    def check_division_exists(cls, db, division_id: int) -> None:
+        checkDivision = db.query(DivisionModel).filter_by(id=division_id).first() is not None
+        if not checkDivision:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division not found")

@@ -1,11 +1,12 @@
 from pydantic import BaseModel, Field
 
-from api.validators.permission_validator import PermissionValidator
+from api.validators.permission_validator import FeaturePermissionValidator
 
 
 class RoleBaseValidator(BaseModel):
     name: str = Field(min_length=2, strip_whitespace=True)
-    permissions: PermissionValidator
+    division_id: int = Field(ge=0)
+    permissions: FeaturePermissionValidator
 
 
 class RoleValidator(RoleBaseValidator):
@@ -13,8 +14,9 @@ class RoleValidator(RoleBaseValidator):
         json_schema_extra = {
             "example": {
                 "name": "chairman",
+                "division_id": 1,
                 "permissions":
-                    PermissionValidator.Config.json_schema_extra["example"]
+                    FeaturePermissionValidator.Config.json_schema_extra["example"]
             }
         }
 
@@ -24,7 +26,8 @@ class RoleUpdateValidator(RoleBaseValidator):
         json_schema_extra = {
             "example": {
                 "name": "member",
+                "division_id": 1,
                 "permissions":
-                    PermissionValidator.Config.json_schema_extra["example"]
+                    FeaturePermissionValidator.Config.json_schema_extra["example"]
             }
         }

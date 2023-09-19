@@ -2,6 +2,10 @@ from pydantic import BaseModel
 
 
 class PermissionValidator(BaseModel):
+    pass
+
+
+class CorePermissionValidator(PermissionValidator):
     UPDATE_USER: bool
     DELETE_USER: bool
     CREATE_DIVISION: bool
@@ -10,6 +14,23 @@ class PermissionValidator(BaseModel):
     CREATE_ROLE: bool
     UPDATE_ROLE: bool
     DELETE_ROLE: bool
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                        "UPDATE_USER": True,
+                        "DELETE_USER": True,
+                        "CREATE_DIVISION": True,
+                        "UPDATE_DIVISION": True,
+                        "DELETE_DIVISION": True,
+                        "CREATE_ROLE": True,
+                        "UPDATE_ROLE": True,
+                        "DELETE_ROLE": True
+                    }
+            }
+
+
+class FeaturePermissionValidator(PermissionValidator):
     CREATE_ASSIGNMENT: bool
     UPDATE_ASSIGNMENT: bool
     DELETE_ASSIGNMENT: bool
@@ -32,31 +53,23 @@ class PermissionValidator(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "UPDATE_USER": True,
-                "DELETE_USER": True,
-                "CREATE_DIVISION": True,
-                "UPDATE_DIVISION": True,
-                "DELETE_DIVISION": True,
-                "CREATE_ROLE": True,
-                "UPDATE_ROLE": True,
-                "DELETE_ROLE": True,
-                "CREATE_ASSIGNMENT": True,
-                "UPDATE_ASSIGNMENT": True,
-                "DELETE_ASSIGNMENT": True,
-                "CREATE_ANNOUNCEMENT": True,
-                "UPDATE_ANNOUNCEMENT": True,
-                "DELETE_ANNOUNCEMENT": True,
-                "CREATE_MEETING": True,
-                "UPDATE_MEETING": True,
-                "DELETE_MEETING": True,
-                "CREATE_SUBMISSION": True,
-                "UPDATE_SUBMISSION": True,
-                "DELETE_SUBMISSION": True,
-                "CREATE_EXCUSE": True,
-                "UPDATE_EXCUSE": True,
-                "DELETE_EXCUSE": True,
-                "CREATE_FEEDBACK": True,
-                "UPDATE_FEEDBACK": True,
-                "DELETE_FEEDBACK": True
+                    "CREATE_ASSIGNMENT": True,
+                    "UPDATE_ASSIGNMENT": True,
+                    "DELETE_ASSIGNMENT": True,
+                    "CREATE_ANNOUNCEMENT": True,
+                    "UPDATE_ANNOUNCEMENT": True,
+                    "DELETE_ANNOUNCEMENT": True,
+                    "CREATE_MEETING": True,
+                    "UPDATE_MEETING": True,
+                    "DELETE_MEETING": True,
+                    "CREATE_SUBMISSION": True,
+                    "UPDATE_SUBMISSION": True,
+                    "DELETE_SUBMISSION": True,
+                    "CREATE_EXCUSE": True,
+                    "UPDATE_EXCUSE": True,
+                    "DELETE_EXCUSE": True,
+                    "CREATE_FEEDBACK": True,
+                    "UPDATE_FEEDBACK": True,
+                    "DELETE_FEEDBACK": True
+                }
             }
-        }

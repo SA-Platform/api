@@ -10,7 +10,6 @@ class AnnouncementBaseValidator(BaseModel):
     description: str = Field(min_length=2, strip_whitespace=True)
     date: datetime | None
     category: AnnouncementsCategory
-    division: str = Field(min_length=2, strip_whitespace=True, to_lower=True, strict=True)
 
     @field_validator("date")
     def validate_date_future(cls, v: datetime) -> datetime:
@@ -27,7 +26,6 @@ class AnnouncementValidator(AnnouncementBaseValidator):
                 "description": "this is really an announcement",
                 "date": "2025-04-24T22:01:32.904Z",
                 "category": "internship",
-                "division": "RAS",
             }
         }
 
@@ -40,6 +38,5 @@ class AnnouncementUpdateValidator(AnnouncementBaseValidator):
                 "description": "update the announcement",
                 "date": "2025-04-24T22:01:32.904Z",
                 "category": "event",
-                "division": "RAS",
             }
         }

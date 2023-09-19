@@ -1,7 +1,6 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from api.const import Permissions
 from api.crud.feature.meeting import Meeting
 from api.db.models import UserModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user, CheckPermission

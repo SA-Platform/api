@@ -31,6 +31,7 @@ class UserModel(Base):
     bio: Mapped[str] = mapped_column(String, nullable=True)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    permissions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     # One-to-Many relationships
     announcements: Mapped[List["AnnouncementModel"]] = Relationship("AnnouncementModel", back_populates="creator",
@@ -45,12 +46,15 @@ class UserModel(Base):
                                                                 cascade="all, delete-orphan")
     feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="creator",
                                                            cascade="all, delete-orphan")
-    user_role_division: Mapped[List["UserRoleDivisonModel"]] = Relationship("UserRoleDivisionModel",
-                                                                            back_populates="user",
-                                                                            cascade="all, delete-orphan")
+    # user_role_division: Mapped[List["UserRoleDivisonModel"]] = Relationship("UserRoleDivisionModel",
+    #                                                                         back_populates="user",
+    #                                                                         cascade="all, delete-orphan")
     user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
                                                                                          back_populates="user",
-                                                                                            cascade="all, delete-orphan")
+                                                                                         cascade="all, delete-orphan")
+
+    user_role: Mapped[List["UserRoleModel"]] = Relationship("UserRoleModel", back_populates="user",
+                                                            cascade="all, delete-orphan")
 
     def set_password(self, password) -> str:
         self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")

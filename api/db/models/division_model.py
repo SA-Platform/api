@@ -29,13 +29,16 @@ class DivisionModel(Base):
     feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="division",
                                                            cascade="all, delete")
 
-    user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
-                                                                             back_populates="division",
-                                                                             cascade="all, delete-orphan")
+    # user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
+    #                                                                          back_populates="division",
+    #                                                                          cascade="all, delete-orphan")
 
     user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
                                                                                          back_populates="division",
                                                                                          cascade="all, delete-orphan")
+
+    roles: Mapped[List["RoleModel"]] = Relationship("RoleModel", back_populates="division",
+                                                    cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"""(id: {self.id}, name: {self.name}, parent: {self.parent})"""

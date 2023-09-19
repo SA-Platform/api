@@ -14,4 +14,4 @@ class UserDivisionPermissionModel(Base):
     division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="user_division_permission")
 
     def __repr__(self):
-        return f"<UserDivisionPermissionModel(user_id={self.user_id}, division_id={self.division_id}, permission={self.permission})>"
+        return f"<UserDivisionPermissionModel(user_id={self.user_id}, division_id={self.division_id}, permission={self.permissions})>"

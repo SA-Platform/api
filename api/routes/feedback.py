@@ -1,7 +1,6 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from api.const import Permissions
 from api.crud.sub_feature.feedback import Feedback
 from api.db.models import UserModel, SubmissionModel  # unresolved reference ignored
 from api.dependencies import get_db, get_current_user, CheckPermission
