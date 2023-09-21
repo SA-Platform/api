@@ -2,6 +2,7 @@ from abc import ABC
 from typing import TypeVar, List, Callable
 
 from fastapi import HTTPException
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session, Query
 from starlette import status
 
@@ -30,6 +31,34 @@ class CoreBase(ABC):
     @classmethod
     def get_db_dump(cls, db: Session) -> List[T]:
         return db.query(cls.db_model).all()
+
+    # Function to filter the table based on keyword arguments
+    @classmethod
+    def filter_table(cls, db: Session, **kwargs) -> T | None:
+
+        query = db.query(cls.db_model)
+
+        for attr, value in kwargs.items():
+            query = query.filter(getattr(cls.db_model, attr) == value)
+
+        try:
+            results = query.first()
+            return results
+        except NoResultFound:
+            return []
+
+    @classmethod
+    def filter_all(cls, db: Session, **kwargs) -> List[T]:
+        query = db.query(cls.db_model)
+
+        for attr, value in kwargs.items():
+            query = query.filter(getattr(cls.db_model, attr) == value)
+
+        try:
+            results = query.all()
+            return results
+        except NoResultFound:
+            return []
 
     @classmethod
     def create(cls, db: Session, **kwargs) -> T:
@@ -79,4 +108,3 @@ class CoreBase(ABC):
             if request_permissions[permission.name]:
                 total_request = total_request | permission.value
         return total_request
-
