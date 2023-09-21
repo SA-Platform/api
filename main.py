@@ -31,5 +31,12 @@ app.include_router(excuses.excusesRouter)
 app.include_router(feedback.feedbacksRouter)
 
 if __name__ == "__main__":
+    import sys
+
+    host = "localhost"
+    if len(sys.argv) > 1 and sys.argv[1] == "deploy":
+        host = "0.0.0.0"
+
     import uvicorn
-    uvicorn.run("main:app", reload=True, host='localhost', port=8000)
+
+    uvicorn.run("main:app", reload=True, host=host, port=8000)
