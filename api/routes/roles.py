@@ -14,7 +14,7 @@ rolesRouter: APIRouter = APIRouter(
 )
 
 
-@rolesRouter.get(path="/roles", dependencies=[Depends(get_current_user)])
+@rolesRouter.get(path="/roles")
 async def get_roles(db: Session = Depends(get_db)):
     return Role.get_db_dump(db)
 
@@ -32,7 +32,7 @@ async def update_role(role_id: int, request: RoleUpdateValidator, db: Session = 
     return Role.update(role_id, db, **request.model_dump())
 
 
-@rolesRouter.delete(path="/roles/{role_id}", dependencies=[Depends(get_current_user)])
+@rolesRouter.delete(path="/roles/{role_id}")
 async def delete_role(role_id: int, db: Session = Depends(get_db),
-                      _: UserModel = Depends(CheckPermission(CorePermissions.DELETE_ROLE))):
+                      _: UserModel = Depends(CheckPermission(CorePermissions.DELETE_ROLE, core=True))):
     return Role.delete(role_id, db)

@@ -9,7 +9,7 @@ class RoleModel(Base):
     __tablename__ = 'roles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(30), nullable=False)
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
     permissions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 

@@ -10,7 +10,6 @@ class MeetingBaseValidator(BaseModel):
     location_text: str | None = None
     location_lat: float | None = None
     location_long: float | None = None
-    division: str = Field(min_length=2, strip_whitespace=True, to_lower=True, strict=True)
 
     @field_validator("date")
     def validate_date_future(cls, v: datetime) -> datetime:
@@ -37,7 +36,6 @@ class MeetingValidator(MeetingBaseValidator):
                 "location_text": "our lovely college",
                 "location_long": "30.586388",
                 "location_lat": "31.482434",
-                "division": "CS",
             }
         }
 
@@ -52,6 +50,5 @@ class MeetingUpdateValidator(MeetingBaseValidator):
                 "location_text": "our lovely college",
                 "location_long": "30.586388",
                 "location_lat": "31.482434",
-                "division": "CS",
             }
         }

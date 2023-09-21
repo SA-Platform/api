@@ -18,18 +18,19 @@ async def get_announcements(db: Session = Depends(get_db)):
 
 @announcementsRouter.post("/announcements/{division_id}")
 async def post_announcement(division_id: int, request: AnnouncementValidator, db: Session = Depends(get_db),
-                            user: UserModel = Depends(get_current_user)):
-    return Announcement.create(request, db, user)
+                            user: UserModel = Depends(CheckPermission(FeaturePermissions.CREATE_ANNOUNCEMENT))):
+    return Announcement.create(request, db, user, division_id)
 
 
-@announcementsRouter.put("/announcements/{announcement_id}")
+@announcementsRouter.put("/announcements/{announcement_id}/{division_id}")
 async def update_announcement(announcement_id: int, request: AnnouncementUpdateValidator,
+                              division_id: int,
                               db: Session = Depends(get_db),
-                              user: UserModel = Depends(get_current_user)):
-    return Announcement.update(announcement_id, request, db, user)
+                              user: UserModel = Depends(CheckPermission(FeaturePermissions.UPDATE_ANNOUNCEMENT))):
+    return Announcement.update(announcement_id, request, db, division_id, user)
 
 
-@announcementsRouter.delete("/announcements/{announcement_id}")
-async def delete_announcement(model_id: int, db: Session = Depends(get_db),
-                              user: UserModel = Depends(get_current_user)):
-    return Announcement.delete(model_id, db, user)
+@announcementsRouter.delete("/announcements/{announcement_id}/{division_id}")
+async def delete_announcement(announcement_id: int, division_id: int, db: Session = Depends(get_db),
+                              user: UserModel = Depends(CheckPermission(FeaturePermissions.DELETE_ANNOUNCEMENT))):
+    return Announcement.delete(announcement_id, db, user)

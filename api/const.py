@@ -44,9 +44,9 @@ class CorePermissions(int, Enum):
     CREATE_DIVISION = 4
     UPDATE_DIVISION = 8
     DELETE_DIVISION = 16
-    CREATE_ROLE = 32
-    UPDATE_ROLE = 64
-    DELETE_ROLE = 128
+    CREATE_ROLE = 32  ## make it a feature permission
+    UPDATE_ROLE = 64  ## make it a feature permission
+    DELETE_ROLE = 128  ## make it a feature permission
 
 
 class FeaturePermissions(int, Enum):

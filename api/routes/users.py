@@ -6,6 +6,7 @@ from api.const import CorePermissions, FeaturePermissions
 from api.crud.core.role import Role
 from api.crud.core.user import User
 from api.crud.core.userdivisionpermission import UserDivisionPermission
+from api.crud.core.userrole import UserRole
 from api.db.models import UserModel, RoleModel, UserRoleModel
 from api.dependencies import get_db, CheckPermission
 from api.utils import create_token, decode_permissions
@@ -60,15 +61,21 @@ async def delete_user(user_id: int, db: Session = Depends(get_db),
     return User.delete(user_id, db)
 
 
-@usersRouter.get("/users_with_special_permissions")
+@usersRouter.get("/users_assigned_to_divisions")
 async def get_users_with_divisions_permissions(db: Session = Depends(get_db)):
     return UserDivisionPermission.get_db_dump(db)
 
 
-@usersRouter.post("/assign_user_special_permissions")
+@usersRouter.get("/get_user_in_division/{division_id}")
+async def get_users_in_division(division_id: int, db: Session = Depends(get_db)):
+    records = UserDivisionPermission.get_db_all(db, "division_id", division_id)
+    return [record.user for record in records]
+
+
+@usersRouter.post("/assign_user_division_permissions")
 async def assign_user_division_permissions(user_id: int, division_id: int, request: FeaturePermissionValidator,
                                            db: Session = Depends(get_db)):
-    return  UserDivisionPermission.create(db, user_id, division_id, **request.model_dump())
+    return UserDivisionPermission.create(db, user_id, division_id, **request.model_dump())
 
 
 @usersRouter.delete("/delete_user_special_permissions/{user_id}/{division_id}")
@@ -89,22 +96,31 @@ async def assign_user_permissions(user_id: int, request: CorePermissionValidator
 @usersRouter.post("/assign_user_role")
 async def assign_user_role(user_id: int, role_id: int, db: Session = Depends(get_db)):
     role = Role.get_db_first(db, "id", role_id)
-    if role: UserDivisionPermission.create(db, user_id, role.division_id, **{
-        "permissions": decode_permissions(0, list(FeaturePermissions))})
+    if role:
+        try:
+            UserDivisionPermission.create(db, user_id, role.division_id,
+                                          **decode_permissions(0, list(FeaturePermissions)))
+        except HTTPException:
+            pass
     return User.assign_user_role(db, user_id, role_id)
+
+
+@usersRouter.delete("/delete_user_role/{user_id}/{role_id}")
+async def delete_user_role(user_id: int, role_id: int, db: Session = Depends(get_db)):
+    return UserRole.delete(db, user_id, role_id)
 
 
 @usersRouter.get("/get_user_roles/{user_id}")
 async def get_user_roles(user_id: int, db: Session = Depends(get_db)):
     user_roles = (
-        db.query(RoleModel.name)
+        db.query(RoleModel)
         .join(UserRoleModel, RoleModel.id == UserRoleModel.role_id)
         .filter(UserRoleModel.user_id == user_id)
         .all()
     )
-    return [role[0] for role in user_roles]
+    return [role for role in user_roles]
 
 
 @usersRouter.post("/assign_user_to_division/{user_id}/{division_id}")
 async def assign_user_to_division(user_id: int, division_id: int, db: Session = Depends(get_db)):
-    return UserDivisionPermission.create(db, user_id, division_id, **{"permissions": 0})
+    return UserDivisionPermission.create(db, user_id, division_id, **decode_permissions(0, list(FeaturePermissions)))

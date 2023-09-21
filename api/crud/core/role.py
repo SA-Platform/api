@@ -12,8 +12,7 @@ class Role(CoreBase):
 
     @classmethod
     def create(cls, db: Session, **kwargs) -> RoleModel:
-        cls.check_role_exists(db, kwargs.get("name"))
-        cls.check_division_exists(db, kwargs.get("division_id"))
+        cls.check_role_exists(db, kwargs.get("name"), kwargs.get("division_id"))
         return super().create(db, name=kwargs["name"],
                               division_id=kwargs["division_id"],
                               permissions=cls._calculate_feature_permission(kwargs["permissions"]))
@@ -26,16 +25,16 @@ class Role(CoreBase):
             if role_found and role_found.id != model_id:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role already exists")
             model.name = kwargs["name"]
-            model.permissions = cls._calculate_total_permission(kwargs["permissions"])
+            model.permissions = cls._calculate_feature_permission(kwargs["permissions"])
             db.commit()
             db.refresh(model)
             return model
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{cls.__name__.lower()} not found")
 
     @classmethod
-    def check_role_exists(cls, db: Session, name: str) -> None:
+    def check_role_exists(cls, db: Session, name: str, division_id: int) -> None:
         role = cls.get_db_first(db, "name", name)
-        if role:
+        if role and role.division_id == division_id:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role already exists")
 
     # @classmethod

@@ -28,7 +28,7 @@ async def create_division(request: DivisionValidator, db: Session = Depends(get_
 
 @divisionsRouter.put("/divisions/{division_id}")
 async def update_division(division_id: int, request: DivisionUpdateValidator, db: Session = Depends(get_db),
-                          _: UserModel = Depends(CheckPermission(CorePermissions.UPDATE_DIVISION))):
+                          _: UserModel = Depends(CheckPermission(CorePermissions.UPDATE_DIVISION, core=True))):
     division = db.query(DivisionModel).filter_by(id=division_id).first()  # fetch division to be edited
     if division:
         Division.check_division_validity(db, request, division_id)
@@ -43,5 +43,5 @@ async def update_division(division_id: int, request: DivisionUpdateValidator, db
 @divisionsRouter.delete("/divisions/{division_id}")
 async def delete_division(division_id: int,
                           db: Session = Depends(get_db),
-                          _: UserModel = Depends(CheckPermission(CorePermissions.DELETE_DIVISION))):
+                          _: UserModel = Depends(CheckPermission(CorePermissions.DELETE_DIVISION, core=True))):
     return Division.delete(division_id, db)
