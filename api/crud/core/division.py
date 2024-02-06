@@ -24,10 +24,11 @@ class Division(CoreBase):
                                 detail=f"only one root division is allowed, which is {root.name}")
 
     @classmethod
-    def check_division_validity(cls, db: Session, request: DivisionBaseValidator, division_id: int | None = None) -> None:
+    def check_division_validity(cls, db: Session, request: DivisionBaseValidator,
+                                division_id: int | None = None) -> None:
         division = cls.get_db_first(db, "name", request.name)
         parent = cls.get_db_first(db, "name", request.parent) if request.parent else None
-        
+
         if request.name == request.parent:
             raise HTTPException(status.HTTP_409_CONFLICT, detail="division can't be its own parent")
 

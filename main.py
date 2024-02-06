@@ -31,6 +31,7 @@ if __name__ == "__main__":
     import uvicorn
     import sys
 
+    # for deployment only (change localhost to 0.0.0.0)
     host = "localhost"
     reload = True
     if len(sys.argv) > 1 and sys.argv[1] == "deploy":

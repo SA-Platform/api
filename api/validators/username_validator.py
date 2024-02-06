@@ -15,5 +15,3 @@ class UsernameValidator(BaseModel):
                 "username": "twibster0x_11"
             }
         }
-
-

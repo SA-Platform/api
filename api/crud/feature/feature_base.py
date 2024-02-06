@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, Mapper
 from starlette import status
 
 from ..core.core_base import CoreBase
-from ...const import Permissions
+from ...const import CorePermissions, FeaturePermissions
 from ...db.models import UserModel, DivisionModel, UserDivisionPermissionModel
 
 
@@ -45,7 +45,8 @@ class FeatureBase(CoreBase):
 
     @classmethod
     def _fetch_permission_value(cls, action: str) -> int:
-        return getattr(Permissions, f"{action}_{cls.__name__.upper()}")
+        action_with_class_name = f"{action}_{cls.__name__.upper()}"
+        return getattr(CorePermissions, action_with_class_name) or getattr(FeaturePermissions, action_with_class_name)
 
     @classmethod
     def _compare_permissions(cls, user: UserModel,

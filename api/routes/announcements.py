@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from api.crud.feature.announcement import Announcement
 from api.db.models import UserModel  # unresolved reference ignored
+from api.dependencies import get_db, get_current_user
 from api.validators import AnnouncementValidator, AnnouncementUpdateValidator
-from api.dependencies import get_db, get_current_user, CheckPermission
 
 announcementsRouter = APIRouter(
     tags=["Announcements"]

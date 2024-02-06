@@ -1,9 +1,9 @@
 # Desc: Tests for the user routes
 from fastapi.testclient import TestClient
 
+from api.crud.core.user import User
 from api.db import SessionLocal
 from main import app  # Import your FastAPI app instance
-from api.crud.core.user import User
 
 # Create a test client
 client = TestClient(app)

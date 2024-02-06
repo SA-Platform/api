@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from .core_base import CoreBase
-from ...const import Permissions
 from ...db.models import RoleModel
 
 
@@ -13,8 +12,8 @@ class Role(CoreBase):
     @classmethod
     def create(cls, db: Session, **kwargs) -> RoleModel:
         cls.check_role_exists(db, kwargs.get("name"))
-        return super().create(db, name=kwargs["name"],
-                              permissions=cls._calculate_total_permission(kwargs["permissions"]))
+        return super().create(db, name=kwargs["name"])
+        # permissions=cls._calculate_total_permission(kwargs["permissions"]))
 
     @classmethod
     def update(cls, model_id: int, db: Session, **kwargs) -> RoleModel:
@@ -24,7 +23,7 @@ class Role(CoreBase):
             if role_found and role_found.id != model_id:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role already exists")
             model.name = kwargs["name"]
-            model.permissions = cls._calculate_total_permission(kwargs["permissions"])
+            # model.permissions = cls._calculate_total_permission(kwargs["permissions"])
             db.commit()
             db.refresh(model)
             return model
@@ -36,10 +35,10 @@ class Role(CoreBase):
         if role:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role already exists")
 
-    @classmethod
-    def _calculate_total_permission(cls, request_permissions: dict) -> int:
-        total_request: int = 0
-        for permission in Permissions:
-            if request_permissions[permission.name]:
-                total_request = total_request | permission.value
-        return total_request
+    # @classmethod
+    # def _calculate_total_permission(cls, request_permissions: dict) -> int:
+    #     total_request: int = 0
+    #     for permission in CorePermission:
+    #         if request_permissions[permission.name]:
+    #             total_request = total_request | permission.value
+    #     return total_request

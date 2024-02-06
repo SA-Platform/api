@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from api.const import Permissions
+from api.const import CorePermissions
 from api.crud.core.user import User
 from api.crud.core.userroledivision import UserRoleDivision
 from api.db.models.user_model import UserModel
@@ -54,7 +54,7 @@ async def validate_username(request: UsernameValidator,
 
 @usersRouter.delete("/delete/{user_id}")
 async def delete_user(user_id: int, db: Session = Depends(get_db),
-                      _: UserModel = Depends(CheckPermission(Permissions.DELETE_USER, core=True))):
+                      _: UserModel = Depends(CheckPermission(CorePermissions.DELETE_USER, core=True))):
     return User.delete(user_id, db)
 
 

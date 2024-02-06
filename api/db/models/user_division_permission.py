@@ -1,6 +1,7 @@
-from .base import Base
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Relationship, mapped_column, Mapped
+
+from .base import Base
 
 
 class UserDivisionPermissionModel(Base):

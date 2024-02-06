@@ -1,10 +1,9 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
-from api.const import Permissions
 from api.crud.sub_feature.feedback import Feedback
-from api.db.models import UserModel, SubmissionModel  # unresolved reference ignored
-from api.dependencies import get_db, get_current_user, CheckPermission
+from api.db.models import UserModel  # unresolved reference ignored
+from api.dependencies import get_db, get_current_user
 from api.validators import FeedbackValidator, FeedbackUpdateValidator
 
 feedbacksRouter = APIRouter(
@@ -26,7 +25,7 @@ async def create_feedback(request: FeedbackValidator, db: Session = Depends(get_
 @feedbacksRouter.put("/feedback/{feedback_id}")
 async def update_feedback(feedback_id: int, request: FeedbackUpdateValidator, db: Session = Depends(get_db),
                           user: UserModel = Depends(get_current_user)):
-    return Feedback.update(feedback_id, db, user,  **request.model_dump())
+    return Feedback.update(feedback_id, db, user, **request.model_dump())
 
 
 @feedbacksRouter.delete("/feedback/{model_id}")

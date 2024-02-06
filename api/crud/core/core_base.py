@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, List, Callable
+from typing import TypeVar, List
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, Query

@@ -32,4 +32,3 @@ class SubmissionModel(Base):
                 "note": {self.note},
                 "attachment": {self.attachment},
             )"""
-
