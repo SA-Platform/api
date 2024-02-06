@@ -1,12 +1,6 @@
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from api.routes.app import app
 from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedback, submissions, roles
-
-app: FastAPI = FastAPI(
-    title="Student Activity Platform API",
-    version="0.0.1",
-)
 
 origins = [
     "*"
