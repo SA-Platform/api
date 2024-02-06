@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from .core_base import CoreBase
+from .division import Division
 from ...db.models import RoleModel
 from ...db.models.division_model import DivisionModel
 
@@ -13,6 +14,10 @@ class Role(CoreBase):
     @classmethod
     def create(cls, db: Session, **kwargs) -> RoleModel:
         cls.check_role_exists(db, kwargs.get("name"), kwargs.get("division_id"))
+        division_exists = Division.get_db_first(db, "id", kwargs.get("division_id"))
+        if not division_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="division does not exist")
+
         return super().create(db, name=kwargs["name"],
                               division_id=kwargs["division_id"],
                               permissions=cls._calculate_feature_permission(kwargs["permissions"]))
