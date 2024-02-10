@@ -6,9 +6,7 @@ from sqlalchemy.orm import Session, aliased
 from api.db import SessionLocal
 from api.db.models import UserModel  # unresolved reference ignored
 from api.db.models.division_model import DivisionModel
-from api.db.models.role_model import RoleModel
-from api.db.models.user_division_permission import UserDivisionPermissionModel
-from api.db.models.user_role import UserRoleModel
+from api.db.models.user_role_division_permission import UserRoleDivisionPermissionModel
 from api.utils import decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/signin")
@@ -65,14 +63,12 @@ class CheckPermission:
     @staticmethod
     def check_role_permission(permission_to_check: int, user: UserModel, division: DivisionModel,
                               db: Session = Depends(get_db)) -> UserModel:
-        user_roles_in_the_division = db.query(RoleModel) \
-            .join(UserRoleModel, UserRoleModel.role_id == RoleModel.id) \
-            .join(UserModel, UserRoleModel.user_id == UserModel.id) \
-            .filter(RoleModel.division == division, UserModel.id == user.id) \
+        user_division_permission_records = db.query(UserRoleDivisionPermissionModel) \
+            .filter(user_id=user.id, division_id=division.id) \
             .all()
-        if user_roles_in_the_division:
-            for role in user_roles_in_the_division:
-                if role.permissions & permission_to_check:
+        if user_division_permission_records:
+            for record in user_division_permission_records:
+                if record.role.permissions & permission_to_check:
                     return user
                 else:
                     continue
@@ -82,10 +78,11 @@ class CheckPermission:
     @staticmethod
     def check_special_user_permission(permission_to_check: int, user: UserModel, division: DivisionModel,
                                       db: Session = Depends(get_db)) -> UserModel:
-        user_division_permission = db.query(UserDivisionPermissionModel) \
+        user_division_permission = db.query(UserRoleDivisionPermissionModel) \
             .filter_by(user_id=user.id, division_id=division.id) \
-            .first()
-        if user_division_permission and user_division_permission.permissions & permission_to_check:
-            return user
-        else:
-            return None
+            .all()
+        for record in user_division_permission:
+            if record.permissions & permission_to_check:
+                return user
+            else:
+                return None

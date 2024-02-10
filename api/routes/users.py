@@ -5,13 +5,12 @@ from sqlalchemy.orm import Session
 from api.const import CorePermissions, FeaturePermissions
 from api.crud.core.role import Role
 from api.crud.core.user import User
-from api.crud.core.userdivisionpermission import UserDivisionPermission
-from api.crud.core.userrole import UserRole
+from api.crud.core.userroledivisionpermission import UserRoleDivisionPermission
 from api.db.models import UserModel, RoleModel, UserRoleModel
 from api.dependencies import get_db, CheckPermission
 from api.utils import create_token, decode_permissions
 from api.validators import UserValidator, UsernameValidator, FeaturePermissionValidator, CorePermissionValidator, \
-    HTTPErrorValidator
+    HTTPErrorValidator, AssignToDivisionValidator
 
 usersRouter: APIRouter = APIRouter(
     prefix="/users",
@@ -63,24 +62,24 @@ async def delete_user(user_id: int, db: Session = Depends(get_db),
 
 @usersRouter.get("/users_assigned_to_divisions")
 async def get_users_with_divisions_permissions(db: Session = Depends(get_db)):
-    return UserDivisionPermission.get_db_dump(db)
+    return UserRoleDivisionPermission.get_db_dump(db)
 
 
 @usersRouter.get("/get_user_in_division/{division_id}")
 async def get_users_in_division(division_id: int, db: Session = Depends(get_db)):
-    records = UserDivisionPermission.get_db_all(db, "division_id", division_id)
+    records = UserRoleDivisionPermission.get_db_all(db, "division_id", division_id)
     return [record.user for record in records]
 
 
 @usersRouter.post("/assign_user_division_permissions")
 async def assign_user_division_permissions(user_id: int, division_id: int, request: FeaturePermissionValidator,
                                            db: Session = Depends(get_db)):
-    return UserDivisionPermission.create(db, user_id, division_id, **request.model_dump())
+    return UserRoleDivisionPermission.create(db, user_id, division_id, role_id=None, **request.model_dump())
 
 
 @usersRouter.delete("/delete_user_special_permissions/{user_id}/{division_id}")
 async def delete_user_division_permissions(user_id: int, division_id: int, db: Session = Depends(get_db)):
-    return UserDivisionPermission.delete(db, user_id, division_id)
+    return UserRoleDivisionPermission.delete(db, user_id, division_id, role_id=None)
 
 
 @usersRouter.get("/get_user_permissions/{user_id}")
@@ -98,29 +97,34 @@ async def assign_user_role(user_id: int, role_id: int, db: Session = Depends(get
     role = Role.get_db_first(db, "id", role_id)
     if role:
         try:
-            UserDivisionPermission.create(db, user_id, role.division_id,
-                                          **decode_permissions(0, list(FeaturePermissions)))
+            UserRoleDivisionPermission.create(db, user_id, role.division_id, role_id,
+                                              **decode_permissions(0, list(FeaturePermissions)))
         except HTTPException:
-            pass
+            HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This role does not exist in any division")
     return User.assign_user_role(db, user_id, role_id)
 
 
 @usersRouter.delete("/delete_user_role/{user_id}/{role_id}")
-async def delete_user_role(user_id: int, role_id: int, db: Session = Depends(get_db)):
-    return UserRole.delete(db, user_id, role_id)
+async def delete_user_role(user_id: int, division_id: int, role_id: int, db: Session = Depends(get_db)):
+    return UserRoleDivisionPermission.delete(db, user_id=user_id, role_id=role_id,
+                                             division_id=division_id)
 
 
 @usersRouter.get("/get_user_roles/{user_id}")
 async def get_user_roles(user_id: int, db: Session = Depends(get_db)):
     user_roles = (
-        db.query(RoleModel)
-        .join(UserRoleModel, RoleModel.id == UserRoleModel.role_id)
-        .filter(UserRoleModel.user_id == user_id)
+        db.query(UserRoleDivisionPermission)
+        .filter_by(user_id=user_id)
         .all()
     )
     return [role for role in user_roles]
 
 
 @usersRouter.post("/assign_user_to_division/{user_id}/{division_id}")
-async def assign_user_to_division(user_id: int, division_id: int, db: Session = Depends(get_db)):
-    return UserDivisionPermission.create(db, user_id, division_id, **decode_permissions(0, list(FeaturePermissions)))
+async def assign_user_to_division(request: AssignToDivisionValidator, user_id: int, division_id: int,
+                                  db: Session = Depends(get_db)):
+    role = Role.get_db_first(db, "id", request.role_id)
+    if not role:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Role not found")
+    return UserRoleDivisionPermission.create(db, user_id, division_id, request.role_id,
+                                             **decode_permissions(0, list(FeaturePermissions)))

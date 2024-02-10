@@ -10,17 +10,18 @@ class RoleModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30), nullable=False)
-    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+    division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"), nullable=True)
     permissions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="roles")
 
-    # user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
-    #                                                                          back_populates="role",
-    #                                                                          cascade="all, delete")
-
     user_role: Mapped[List["UserRoleModel"]] = Relationship("UserRoleModel", back_populates="role",
                                                             cascade="all, delete-orphan")
+
+    user_role_division_permission: Mapped[List["UserRoleDivisionPermissionModel"]] = Relationship(
+        "UserRoleDivisionPermissionModel",
+        back_populates="role",
+        cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"""Role(
