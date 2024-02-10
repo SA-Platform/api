@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from api.validators.permission_validator import FeaturePermissionValidator
@@ -5,7 +7,7 @@ from api.validators.permission_validator import FeaturePermissionValidator
 
 class RoleBaseValidator(BaseModel):
     name: str = Field(min_length=2, strip_whitespace=True)
-    division_id: int = Field(ge=0)
+    division_id: Optional[int] = Field(ge=0, nullable=True)
     permissions: FeaturePermissionValidator
 
 

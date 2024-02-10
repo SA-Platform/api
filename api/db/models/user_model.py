@@ -46,12 +46,11 @@ class UserModel(Base):
                                                                 cascade="all, delete-orphan")
     feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="creator",
                                                            cascade="all, delete-orphan")
-    # user_role_division: Mapped[List["UserRoleDivisonModel"]] = Relationship("UserRoleDivisionModel",
-    #                                                                         back_populates="user",
-    #                                                                         cascade="all, delete-orphan")
-    user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
-                                                                                         back_populates="user",
-                                                                                         cascade="all, delete-orphan")
+
+    user_role_division_permission: Mapped[List["UserRoleDivisionPermissionModel"]] = Relationship(
+        "UserRoleDivisionPermissionModel",
+        back_populates="user",
+        cascade="all, delete-orphan")
 
     user_role: Mapped[List["UserRoleModel"]] = Relationship("UserRoleModel", back_populates="user",
                                                             cascade="all, delete-orphan")

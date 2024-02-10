@@ -29,11 +29,7 @@ class DivisionModel(Base):
     feedback: Mapped[List["FeedbackModel"]] = Relationship("FeedbackModel", back_populates="division",
                                                            cascade="all, delete")
 
-    # user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
-    #                                                                          back_populates="division",
-    #                                                                          cascade="all, delete-orphan")
-
-    user_division_permission: Mapped[List["UserDivisionPermissionModel"]] = Relationship("UserDivisionPermissionModel",
+    user_role_division_permission: Mapped[List["UserRoleDivisionPermissionModel"]] = Relationship("UserRoleDivisionPermissionModel",
                                                                                          back_populates="division",
                                                                                          cascade="all, delete-orphan")
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, Mapper
 from starlette import status
 
 from ..core.core_base import CoreBase
-from ...db.models import UserModel, DivisionModel, UserDivisionPermissionModel
+from ...db.models import UserModel, DivisionModel
 
 
 class FeatureBase(CoreBase):
