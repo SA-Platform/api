@@ -1,5 +1,5 @@
 from .feature_base import FeatureBase
-from ...db.models import AnnouncementModel
+from ...db.models.announcement_model import AnnouncementModel
 
 
 class Announcement(FeatureBase):

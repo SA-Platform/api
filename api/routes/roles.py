@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 
 from api.const import CorePermissions
 from api.crud.core.role import Role
-from api.db.models import UserModel
+from api.db.models.user_model import UserModel
 from api.dependencies import get_db, get_current_user, CheckPermission
-from api.validators import RoleValidator, RoleUpdateValidator
+from api.validators.role_validator import RoleValidator, RoleUpdateValidator
 
 rolesRouter: APIRouter = APIRouter(
     tags=["Roles"]

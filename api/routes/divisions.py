@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 
 from api.const import CorePermissions
 from api.crud.core.division import Division
-from api.db.models import UserModel, DivisionModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
+from api.db.models.division_model import DivisionModel 
 from api.dependencies import get_db, CheckPermission
-from api.validators import DivisionValidator, DivisionUpdateValidator  # unresolved reference ignored
+from api.validators.division_validator import DivisionValidator, DivisionUpdateValidator  
 
 divisionsRouter = APIRouter(
     tags=["Divisions"]

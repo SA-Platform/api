@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from api.crud.sub_feature.excuse import Excuse
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
 from api.dependencies import get_db, get_current_user
-from api.validators import ExcuseValidator, ExcuseUpdateValidator
+from api.validators.excuse_validator import ExcuseValidator, ExcuseUpdateValidator
 
 excusesRouter = APIRouter(
     tags=["Excuses"]

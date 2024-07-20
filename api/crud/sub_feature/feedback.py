@@ -1,5 +1,7 @@
 from .sub_feature_base import SubFeatureBase
-from ...db.models import FeedbackModel, SubmissionModel
+from ...db.models.feedback_model import FeedbackModel
+from ...db.models.submission_model import SubmissionModel
+
 
 
 class Feedback(SubFeatureBase):

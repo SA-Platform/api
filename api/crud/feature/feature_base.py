@@ -5,7 +5,12 @@ from starlette import status
 
 from ..core.core_base import CoreBase
 from ...const import CorePermissions, FeaturePermissions
-from ...db.models import UserModel, DivisionModel, UserDivisionPermissionModel
+from ...db.models.user_model import UserModel
+from ...db.models.division_model import DivisionModel
+from ...db.models.user_division_permission import UserDivisionPermissionModel
+
+
+
 
 
 class FeatureBase(CoreBase):

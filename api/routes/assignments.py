@@ -2,9 +2,9 @@ from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 
 from api.crud.feature.assignment import Assignment
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
 from api.dependencies import get_current_user, get_db
-from api.validators import AssignmentValidator, AssignmentUpdateValidator
+from api.validators.assignment_validator import AssignmentValidator, AssignmentUpdateValidator
 
 assignmentsRouter = APIRouter(
     tags=["Assignments"]

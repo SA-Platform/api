@@ -1,5 +1,5 @@
 from .feature_base import FeatureBase
-from ...db.models import MeetingModel
+from ...db.models.meeting_model import MeetingModel
 
 
 class Meeting(FeatureBase):

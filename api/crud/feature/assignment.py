@@ -1,5 +1,5 @@
 from .feature_base import FeatureBase
-from ...db.models import AssignmentModel
+from ...db.models.assignment_model import AssignmentModel
 
 
 class Assignment(FeatureBase):

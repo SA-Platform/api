@@ -6,8 +6,11 @@ from .core_base import CoreBase
 from .division import Division
 from .role import Role
 from .user import User
-from ...db.models import UserModel, DivisionModel, UserDivisionPermissionModel, RoleModel
-from ...db.models import UserRoleDivisionModel
+from ...db.models.user_model import UserModel
+from ...db.models.division_model import DivisionModel
+from ...db.models.role_model import RoleModel
+from ...db.models.user_role_division import UserRoleDivisionModel
+from ...db.models.user_division_permission import UserDivisionPermissionModel
 
 
 class UserRoleDivision(CoreBase):

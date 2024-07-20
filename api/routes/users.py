@@ -4,11 +4,12 @@ from sqlalchemy.orm import Session
 
 from api.const import CorePermissions
 from api.crud.core.user import User
-from api.crud.core.userroledivision import UserRoleDivision
+from api.crud.core.user_role_division import UserRoleDivision
 from api.db.models.user_model import UserModel
 from api.dependencies import get_db, CheckPermission
 from api.utils import create_token
-from api.validators import UserValidator, UsernameValidator, HTTPErrorValidator
+from api.validators.user_validator import UserValidator, UsernameValidator
+from api.validators.httperror_validator import HTTPErrorValidator
 
 usersRouter: APIRouter = APIRouter(
     prefix="/users",

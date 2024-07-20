@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from api.crud.feature.announcement import Announcement
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel 
 from api.dependencies import get_db, get_current_user
-from api.validators import AnnouncementValidator, AnnouncementUpdateValidator
+from api.validators.announcement_validator import AnnouncementValidator, AnnouncementUpdateValidator
 
 announcementsRouter = APIRouter(
     tags=["Announcements"]

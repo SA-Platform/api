@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from .core_base import CoreBase
-from ...db.models import DivisionModel
-from ...validators import DivisionBaseValidator
+from ...db.models.division_model import DivisionModel
+from ...validators.division_validator import DivisionBaseValidator
 
 
 class Division(CoreBase):

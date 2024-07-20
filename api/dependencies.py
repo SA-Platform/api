@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from api.db import SessionLocal
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
 from api.db.models.division_model import DivisionModel
 from api.db.models.role_model import RoleModel
 from api.db.models.user_division_permission import UserDivisionPermissionModel

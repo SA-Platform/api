@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from .core_base import CoreBase
-from ...db.models import UserModel
+from ...db.models.user_model import UserModel
 
 
 class User(CoreBase):

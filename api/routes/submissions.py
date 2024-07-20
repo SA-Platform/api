@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from api.crud.sub_feature.submission import Submission
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
 from api.dependencies import get_db, get_current_user
-from api.validators import SubmissionValidator, SubmissionUpdateValidator  # unresolved reference ignored
+from api.validators.submission_validator import SubmissionValidator, SubmissionUpdateValidator 
 
 submissionsRouter = APIRouter(
     tags=["Submissions"]

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, Mapper
 
 from ..feature.feature_base import FeatureBase
-from ...db.models import UserModel
+from ...db.models.user_model import UserModel
 
 T = TypeVar("T")
 

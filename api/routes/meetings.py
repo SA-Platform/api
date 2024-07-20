@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 
 from api.crud.feature.meeting import Meeting
-from api.db.models import UserModel  # unresolved reference ignored
+from api.db.models.user_model import UserModel
 from api.dependencies import get_db, get_current_user
-from api.validators import MeetingValidator, MeetingUpdateValidator
+from api.validators.meeting_validator import MeetingValidator, MeetingUpdateValidator
 
 meetingsRouter = APIRouter(
     tags=["Meetings"]

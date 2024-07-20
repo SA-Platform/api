@@ -1,5 +1,6 @@
 from .sub_feature_base import SubFeatureBase
-from ...db.models import ExcuseModel, AssignmentModel
+from ...db.models.excuse_model import ExcuseModel
+from ...db.models.assignment_model import AssignmentModel
 
 
 class Excuse(SubFeatureBase):

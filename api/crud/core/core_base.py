@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, Query
 from starlette import status
 
-from ...db.models import UserModel
+from ...db.models.user_model import UserModel
 
 T = TypeVar("T")
 
