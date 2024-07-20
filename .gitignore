@@ -1,5 +1,6 @@
 # Ignore the virtual environment directory
 venv/
+windows-env/
 
 # Ignore compiled Python files
 *.pyc
