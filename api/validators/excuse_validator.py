@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class ExcuseBaseValidator(BaseModel):
     """This model is only used for inheritance"""
+
     description: str = Field(min_length=2, strip_whitespace=True)
     validity: datetime
 
@@ -17,6 +18,7 @@ class ExcuseBaseValidator(BaseModel):
 
 class ExcuseValidator(ExcuseBaseValidator):
     """this model is used for creation as it includes the assignment field"""
+
     assignment: int
 
     class Config:

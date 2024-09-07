@@ -4,18 +4,19 @@ from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from api.db.models.base import Base
+from api.db.models.user_role_division import UserRoleDivisionModel
 
 
 class RoleModel(Base):
-    __tablename__ = 'roles'
+    __tablename__ = "roles"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     permissions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship("UserRoleDivisionModel",
-                                                                             back_populates="role",
-                                                                             cascade="all, delete")
+    user_role_division: Mapped[List["UserRoleDivisionModel"]] = Relationship(
+        "UserRoleDivisionModel", back_populates="role", cascade="all, delete"
+    )
 
     def __repr__(self):
         return f"""Role(

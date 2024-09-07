@@ -20,7 +20,7 @@ class MeetingBaseValidator(BaseModel):
     @field_validator("location_lat", "location_long")
     def check_precision(cls, value: float) -> float:
         if isinstance(value, float):
-            precision = len(str(value).split('.')[-1])
+            precision = len(str(value).split(".")[-1])
             if precision < 6:
                 raise ValueError("Float value must have at least 6 decimal places.")
         return value
