@@ -13,8 +13,7 @@ class RoleValidator(RoleBaseValidator):
         json_schema_extra = {
             "example": {
                 "name": "chairman",
-                "permissions":
-                    PermissionValidator.Config.json_schema_extra["example"]
+                "permissions": PermissionValidator.Config.json_schema_extra["example"],
             }
         }
 
@@ -24,7 +23,6 @@ class RoleUpdateValidator(RoleBaseValidator):
         json_schema_extra = {
             "example": {
                 "name": "member",
-                "permissions":
-                    PermissionValidator.Config.json_schema_extra["example"]
+                "permissions": PermissionValidator.Config.json_schema_extra["example"],
             }
         }
