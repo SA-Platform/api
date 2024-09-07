@@ -1,22 +1,32 @@
 from api.routes.app import app
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import divisions, announcements, users, meetings, assignments, excuses, feedback, submissions, roles
+from api.routes import (
+    usersRouter,
+    divisionsRouter,
+    rolesRouter,
+    assignmentsRouter,
+    announcementsRouter,
+    meetingsRouter,
+    submissionsRouter,
+    excusesRouter,
+    feedbacksRouter,
+)
 
 # set title and version for swagger
 app.title = "Student Activity Platform API"
 app.version = "0.0.1"
 
 # include routers (link all of them to the main app)
-app.include_router(users.usersRouter)
-app.include_router(divisions.divisionsRouter)
-app.include_router(roles.rolesRouter)
-app.include_router(assignments.assignmentsRouter)
-app.include_router(announcements.announcementsRouter)
-app.include_router(meetings.meetingsRouter)
-app.include_router(submissions.submissionsRouter)
-app.include_router(excuses.excusesRouter)
-app.include_router(feedback.feedbacksRouter)
+app.include_router(usersRouter)
+app.include_router(divisionsRouter)
+app.include_router(rolesRouter)
+app.include_router(assignmentsRouter)
+app.include_router(announcementsRouter)
+app.include_router(meetingsRouter)
+app.include_router(submissionsRouter)
+app.include_router(excusesRouter)
+app.include_router(feedbacksRouter)
 
 # set CORS policy
 app.add_middleware(

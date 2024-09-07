@@ -3,7 +3,11 @@ import datetime
 from sqlalchemy import String, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, Relationship
 
+from api.db.models.assignment_model import AssignmentModel
 from api.db.models.base import Base
+from api.db.models.division_model import DivisionModel
+from api.db.models.feedback_model import FeedbackModel
+from api.db.models.user_model import UserModel
 
 
 class SubmissionModel(Base):
@@ -14,15 +18,24 @@ class SubmissionModel(Base):
     assignment_id: Mapped[int] = mapped_column(ForeignKey("assignments.id"))
     attachment: Mapped[str] = mapped_column(String, nullable=True)
     note: Mapped[str] = mapped_column(String)
-    date_created: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now())
+    date_created: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), default=datetime.datetime.now()
+    )
     division_id: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
 
     # Many-to-One relationships
-    creator: Mapped["UserModel"] = Relationship("UserModel", back_populates="submissions")
-    assignment: Mapped["AssignmentModel"] = Relationship("AssignmentModel", back_populates="submissions")
-    feedback: Mapped["FeedbackModel"] = Relationship("FeedbackModel", back_populates="submission",
-                                                     cascade="all, delete-orphan")
-    division: Mapped["DivisionModel"] = Relationship("DivisionModel", back_populates="submissions")
+    creator: Mapped["UserModel"] = Relationship(
+        "UserModel", back_populates="submissions"
+    )
+    assignment: Mapped["AssignmentModel"] = Relationship(
+        "AssignmentModel", back_populates="submissions"
+    )
+    feedback: Mapped["FeedbackModel"] = Relationship(
+        "FeedbackModel", back_populates="submission", cascade="all, delete-orphan"
+    )
+    division: Mapped["DivisionModel"] = Relationship(
+        "DivisionModel", back_populates="submissions"
+    )
 
     def __repr__(self):
         return f"""Permission(
